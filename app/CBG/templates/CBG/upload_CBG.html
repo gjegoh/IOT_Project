@@ -1,0 +1,23 @@
+{% extends 'CBG/base.html' %}
+{% load static %}
+
+{% block head %}
+{% block title %}Upload CBG{% endblock %}
+{% endblock %}
+
+{% block body %}
+{% if user.is_authenticated %}
+    <h1>Index Page</h1>
+    <p>Hi {{ user.username }}!</p>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Upload</button>
+    </form>
+    <p><a href="{% url 'logout' %}">Log Out</a></p>
+{% else %}
+<h1>Index Page</h1>
+    <p>You are not logged in</p>
+    <a href="{% url 'login' %}">Log In</a>
+{% endif %}
+{% endblock %}
