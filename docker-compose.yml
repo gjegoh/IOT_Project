@@ -18,8 +18,8 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=spm
-      - POSTGRES_DB=LJPS_DB
+      - POSTGRES_PASSWORD=iot
+      - POSTGRES_DB=CBG_DB
 
 volumes:
   postgres_data:
