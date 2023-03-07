@@ -9,6 +9,7 @@
 {% if user.is_authenticated %}
     <h1>Index Page</h1>
     <p>Hi {{ user.username }}!</p>
+    {{ form.media }}
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
