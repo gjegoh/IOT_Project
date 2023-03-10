@@ -10,9 +10,11 @@
 <div id="uploadCBGMain">
     <div class="header">
         <h1>Upload CBG Page</h1>
-        <p>Welcome back <b>{{ user.username }}</b>!</p>
+        <p><a href="{% url 'Main:index' %}">Home</a></p>
+        <p><a href="{% url 'Food:upload_Food' %}">Upload Food</a></p>
+        <p><a href="{% url 'Smart:upload_Smart' %}">Smart Upload</a></p>
         {{ form.media }}
-        <p><a href="{% url 'logout' %}">Log Out</a></p>
+        <p><a href="{% url 'Main:logout' %}"">Log Out</a></p>
     </div>
     <!-- Upload Area -->
     <div id="uploaderBox">
@@ -71,10 +73,10 @@
 {% else %}
 <h1>Index Page</h1>
     <p>You are not logged in</p>
-    <a href="{% url 'login' %}">Log In</a>
+    <a href="{% url 'Main:login' %}">Log In</a>
 {% endif %}
 </div>
-    
+<script src="{% static 'CBG/js/script.js' %}"></script>
 <script>
 // Design By
     // - https://codepen.io/Ali-Majed/pen/BaRoyrG
@@ -285,3 +287,4 @@
     // :)
 </script>
 {% endblock %}
+
