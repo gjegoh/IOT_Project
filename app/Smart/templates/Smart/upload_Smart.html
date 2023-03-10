@@ -1,0 +1,26 @@
+{% extends 'Food/base.html' %}
+{% load static %}
+
+{% block head %}
+{% block title %}Smart Upload{% endblock %}
+{% endblock %}
+
+{% block body %}
+    {% if user.is_authenticated %}
+        <h1>Smart Upload</h1>
+        <p><a href="{% url 'Main:index' %}">Home</a></p>
+        <p><a href="{% url 'CBG:upload_CBG' %}">Upload CBG</a></p>
+        <p><a href="{% url 'Food:upload_Food' %}">Upload Food</a></p>
+        <form method="POST" enctype="multipart/form-data" action="">
+            <label for="img">Select image:</label>
+            <input type="file" id="img" name="img" accept="image/*">
+            <br><button type="submit">Upload</button>
+        </form>
+        <p><a href="{% url 'Main:logout' %}">Log Out</a></p>
+    {% else %}
+    <h1>Index Page</h1>
+        <p>You are not logged in</p>
+        <a href="{% url 'Main:login' %}">Log In</a>
+    {% endif %} 
+    <script src="{% static 'Smart/js/script.js' %}"></script>
+{% endblock %}

@@ -16,10 +16,10 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='CBG_Reading',
+            name='Food_Recognition',
             fields=[
                 ('Image_ID', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('Image', models.ImageField(upload_to='Uploaded_Images/CBG_Images/')),
+                ('Image', models.ImageField(upload_to='CBG_Images/')),
                 ('Image_Uploaded_At', models.DateTimeField(blank=True, null=True)),
                 ('User', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],

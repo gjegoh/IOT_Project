@@ -28,8 +28,7 @@ $ docker-compose down --volumes
 
 ## How to use the Project
 - To signup:
-    - Navigate to localhost:8000/signup
-    - Login with your new account details
+    - Navigate to localhost:8000/register
 
 - To login as a admin:
     - Username: admin

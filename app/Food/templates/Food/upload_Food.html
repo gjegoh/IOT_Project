@@ -1,15 +1,15 @@
-{% extends 'CBG/base.html' %}
+{% extends 'Food/base.html' %}
 {% load static %}
 
 {% block head %}
-{% block title %}Upload CBG{% endblock %}
+{% block title %}Upload Food{% endblock %}
 {% endblock %}
 
 {% block body %}
     {% if user.is_authenticated %}
-        <h1>Upload CBG</h1>
+        <h1>Upload Food</h1>
         <p><a href="{% url 'Main:index' %}">Home</a></p>
-        <p><a href="{% url 'Food:upload_Food' %}">Upload Food</a></p>
+        <p><a href="{% url 'CBG:upload_CBG' %}">Upload CBG</a></p>
         <p><a href="{% url 'Smart:upload_Smart' %}">Smart Upload</a></p>
         {{ form.media }}
         <form method="POST" enctype="multipart/form-data">
@@ -23,5 +23,5 @@
         <p>You are not logged in</p>
         <a href="{% url 'Main:login' %}">Log In</a>
     {% endif %}
-    <script src="{% static 'CBG/js/script.js' %}"></script>
+    <script src="{% static 'Food/js/script.js' %}"></script>
 {% endblock %}
