@@ -33,7 +33,26 @@
 }
 
 .header{
+    padding-top: 25px;
     text-align: center;
+}
+
+.menu-aligner{
+    display: flex;
+    padding: 0 20px;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-link{
+    padding: 0.5rem 0.25rem !important;
+}
+
+.toast{
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    margin:20px;
 }
 
 /* End General Styles */
@@ -47,7 +66,6 @@
     border: 2px solid var(--clr-light-blue);
     border-radius: 24px;
     padding: 2rem 1.875rem 2rem 1.875rem;
-    margin: 0.625rem;
     text-align: center;
 }
 
