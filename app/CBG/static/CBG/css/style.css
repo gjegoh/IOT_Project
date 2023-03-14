@@ -25,15 +25,25 @@
     font-size: 1.125rem;
 }
 
-#uploaderBox {
-    min-height: 85vh;
+.boxStyle {
+    text-align: center;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
+.manualFormBox{
+    margin-top: 25px;
+    display: flex;
+}
+
+.formFields{
+    margin: 0 10px;
+    width: 100px;
+}
+
 .header{
-    padding-top: 25px;
+    padding: 25px 0;
     text-align: center;
 }
 
