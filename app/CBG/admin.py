@@ -5,7 +5,8 @@ class CBG_ReadingAdmin(admin.ModelAdmin):
     list_display = (
         "User",
         "Image_ID",
-        "Image_Uploaded_At"
+        "Image_Uploaded_At",
+        "Reading"
     )
     
 admin.site.register(CBG_Reading, CBG_ReadingAdmin)
