@@ -148,3 +148,7 @@ MESSAGE_TAGS = {
         messages.WARNING: 'alert-warning',
         messages.ERROR: 'alert-danger',
 }
+
+PROJECT_DIR = os.path.dirname(__file__)
+MEDIA_ROOT = os.path.join(PROJECT_DIR, "media")
+MEDIA_URL = '/media/'

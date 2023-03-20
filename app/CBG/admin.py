@@ -4,9 +4,9 @@ from .models import CBG_Reading
 class CBG_ReadingAdmin(admin.ModelAdmin):
     list_display = (
         "User",
-        "Image_ID",
-        "Image_Uploaded_At",
-        "Reading"
+        "Reading_ID",
+        "Reading",
+        "Measurement"
     )
     
 admin.site.register(CBG_Reading, CBG_ReadingAdmin)
