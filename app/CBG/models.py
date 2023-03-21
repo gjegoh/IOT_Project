@@ -8,4 +8,4 @@ class CBG_Reading(models.Model):
     Image = models.ImageField(upload_to='Uploaded_Images/CBG_Images/', blank=True)
     Reading = models.FloatField(default=0, blank=True)
     Measurement = models.CharField(max_length=5, default="",  blank=True)
-    Reading_Uploaded_At = models.DateTimeField(blank=True, null=True)
+    Reading_Uploaded_At = models.DateTimeField(blank=True, null=True) 

@@ -6,7 +6,8 @@ class CBG_ReadingAdmin(admin.ModelAdmin):
         "User",
         "Reading_ID",
         "Reading",
-        "Measurement"
+        "Measurement",
+        "Reading_Uploaded_At"
     )
     
 admin.site.register(CBG_Reading, CBG_ReadingAdmin)
