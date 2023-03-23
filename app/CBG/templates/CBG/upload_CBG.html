@@ -114,6 +114,13 @@
             <button id="manualSubmitBtn" onclick="getLocalTime()" class="mt-3 btn btn-primary" type="submit" disabled>Submit</button>
         </form>
     </div>
+    <!-- Start of Tele Button Test -->
+    <div>
+        <input id="CHAT_ID" value="{{ CHAT_ID }}" type="hidden" />
+        <input id="TELE_TOKEN" value="{{ TELE_TOKEN }}" type="hidden" />
+        <button class="btn-primary btn" onclick="reminderTeleMsg()">Reminder Tele Msg</button>
+    </div>
+    <!-- End of Tele Button Test -->
     <!-- End of Manual Upload Area -->
     <div id="toastHolder">
         <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="700" data-autohide="false">
@@ -332,6 +339,21 @@
     function showToast(){
         alert("haha")
         $('.toast').toast('show');
+    }
+
+    const teleToken = document.getElementById("TELE_TOKEN").value;
+    const chatID = document.getElementById("CHAT_ID").value;
+    const telegramURL = 'https://api.telegram.org/bot'
+
+    function reminderTeleMsg(){
+        let message = "Have you submitted your CBG reading for today?"
+        axios.post(telegramURL + teleToken + '/sendMessage?chat_id=' + chatID +'&text='+ message)
+        .then(function (response) {
+            console.log(response);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
     }
 </script>
 {% endblock %}

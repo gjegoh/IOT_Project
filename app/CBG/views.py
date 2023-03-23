@@ -40,5 +40,9 @@ def upload_CBG(request):
                 Reading=reading,
                 Measurement=measurement
             )
-        return render(request, 'CBG/upload_CBG.html')
-    return render(request, 'CBG/upload_CBG.html')
+        # return render(request, 'CBG/upload_CBG.html')
+        return HttpResponseRedirect('/') 
+    return render(request, 'CBG/upload_CBG.html', context={
+        'TELE_TOKEN': os.environ.get('TELE_TOKEN'),
+        'CHAT_ID': os.environ.get('CHAT_ID'),
+    })
