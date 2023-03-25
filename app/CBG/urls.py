@@ -5,4 +5,5 @@ from django.conf import settings
 
 urlpatterns = [
     path('upload_CBG/', views.upload_CBG, name='upload_CBG'),
+    path('read_CBG/', views.read_CBG, name='read_CBG'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

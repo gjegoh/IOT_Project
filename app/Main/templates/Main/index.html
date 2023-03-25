@@ -9,9 +9,7 @@
 {% if user.is_authenticated %}
     <h1>Index Page</h1>
     <p>Hi {{ user.username }}!</p>
-    <p><a href="{% url 'CBG:upload_CBG' %}">Upload CBG</a></p>
-    <p><a href="{% url 'Food:upload_Food' %}">Upload Food</a></p>
-    <p><a href="{% url 'Smart:upload_Smart' %}">Smart Upload</a></p>
+    <p><a href="{% url 'CBG:upload_CBG' %}">Upload Readings</a></p>
     <p><a href="{% url 'Main:logout' %}">Log Out</a></p>
 {% else %}
 <h1>Index Page</h1>

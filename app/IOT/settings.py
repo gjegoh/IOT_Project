@@ -43,9 +43,7 @@ INSTALLED_APPS = [
     'CBG',
     'DB_init',
     "bootstrap_datepicker_plus",
-    'Food',
     'Main',
-    'Smart'
 ]
 
 MIDDLEWARE = [

@@ -1,16 +1,18 @@
 from django.contrib import admin
-from .models import CBG_Reading
+from .models import CBG_Food_Record, CBG_Image
 
-class CBG_ReadingAdmin(admin.ModelAdmin):
+class CBG_Food_RecordAdmin(admin.ModelAdmin):
     list_display = (
         "User",
-        "Reading_ID",
-        "Reading",
-        "Measurement",
-        "Reading_Uploaded_At"
+        "Record_ID"
     )
     
-admin.site.register(CBG_Reading, CBG_ReadingAdmin)
+admin.site.register(CBG_Food_Record, CBG_Food_RecordAdmin)
+
+class CBG_ImageAdmin(admin.ModelAdmin):
+    list_display = ("Image_ID",)
+    
+admin.site.register(CBG_Image, CBG_ImageAdmin)
 
 
 
