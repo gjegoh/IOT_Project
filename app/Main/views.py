@@ -3,13 +3,29 @@ from .forms import *
 from django.contrib import messages
 from django.contrib.auth import login as login_f, authenticate, logout as logout_f
 from django.contrib.auth.forms import AuthenticationForm
+from CBG.models import CBG_Reading
+import datetime
+from pytz import timezone
 
 # endpoint to render index page for all users
 def index(request):
     if request.method == 'GET':
+        query_set = CBG_Reading.objects.all().order_by('Reading_Uploaded_At__minute')
+        readings = []
+        measurements = []
+        datetime = []
+        for i in query_set:
+            readings.append(i.Reading)
+            measurements.append(i.Measurement)
+            datetime.append(i.Reading_Uploaded_At.astimezone(timezone('Asia/Singapore')).strftime("%Y/%m/%d, %H:%M"))
         return render(
             request,
-            'Main/index.html'
+            'Main/index.html',
+            context={
+                'readings': readings,
+                'measurements': measurements,
+                'datetime': datetime
+            }
         )
 
 # renders registration page for all users

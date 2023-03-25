@@ -18,4 +18,10 @@
     <p>You are not logged in</p>
     <a href="{% url 'Main:login' %}">Log In</a>
 {% endif %}
+
+<script>
+    var readings = {{readings|safe}}
+    var measurements = {{measurements|safe}}
+    var datetime = {{datetime|safe}}
+</script>
 {% endblock %}
