@@ -20,6 +20,16 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=iot
       - POSTGRES_DB=CBG_DB
+      
+  telegram:
+    container_name: tele_bot
+    build: ./tele_bot
+    volumes:
+      - ./tele_bot/:/usr/src/tele_bot
+    ports:
+      - 8001:8001
+    env_file:
+      - ./.env.dev  
 
 volumes:
   postgres_data:
