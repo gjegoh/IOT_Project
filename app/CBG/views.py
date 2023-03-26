@@ -9,6 +9,7 @@ from CBG.pipelines.CBG_Pipeline import Process_CBG
 import os
 from .models import CBG_Image, CBG_Food_Record
 from django.views.decorators.csrf import csrf_exempt
+from pytz import timezone
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"iot-project-380504-fba837331a02.json"
 
@@ -30,10 +31,23 @@ def upload_CBG(request):
             After_CBG_Measurement=request.POST.get('measurement2'),
             After_CBG_Uploaded_At=request.POST.get('datetimepicker3'),
         )
-        return HttpResponseRedirect('/') 
+        return HttpResponseRedirect('/')
+    else:
+        query_set = CBG_Food_Record.objects.all().order_by('Before_CBG_Uploaded_At__minute')
+        readings = []
+        cbg_datetime = []
+
+        for i in query_set:
+            readings.append(i.Before_CBG_Reading)
+            readings.append(i.After_CBG_Reading)
+            cbg_datetime.append(i.Before_CBG_Uploaded_At.astimezone(timezone('Asia/Singapore')).strftime("%Y/%m/%d, %H:%M"))
+            cbg_datetime.append(i.After_CBG_Uploaded_At.astimezone(timezone('Asia/Singapore')).strftime("%Y/%m/%d, %H:%M"))
+
     return render(request, 'CBG/upload_CBG.html', context={
         'TELE_TOKEN': os.environ.get('TELE_TOKEN'),
         'CHAT_ID': os.environ.get('CHAT_ID'),
+        'readings': readings,
+        'cbg_datetime': cbg_datetime
     })
     
 

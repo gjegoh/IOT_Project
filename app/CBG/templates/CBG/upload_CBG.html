@@ -167,7 +167,7 @@
                                 </div>
                                 <div class="form-group formFields">
                                     <label for="reading5">Fibre (g)</label>
-                                    <input id="reading5" name="reading5" type="number" class="form-control" step=".1">
+                                    <input id="reading5" name="reading5" type="number" class="form-control">
                                 </div>
                             </div>
                             <br>
@@ -252,7 +252,7 @@
     <div>
         <input id="CHAT_ID" value="{{ CHAT_ID }}" type="hidden" />
         <input id="TELE_TOKEN" value="{{ TELE_TOKEN }}" type="hidden" />
-        <button class="btn-primary btn" onclick="reminderTeleMsg()">Reminder Tele Msg</button>
+        <button class="btn-primary btn" onclick="exceedThresholdTeleMsg()">Reminder Tele Msg</button>
     </div>
     <!-- End of Tele Button Test -->
 {% else %}
@@ -319,15 +319,11 @@
         dropZoon.classList.add('drop-zoon--over');
     })
     dropZoon2.addEventListener('dragover', function (event) {
-        // Prevent Default Behavior 
         event.preventDefault();
-        // Add Class (drop-zoon--over) On (drop-zoon)
         dropZoon2.classList.add('drop-zoon--over');
     })
     dropZoon3.addEventListener('dragover', function (event) {
-        // Prevent Default Behavior 
         event.preventDefault();
-        // Add Class (drop-zoon--over) On (drop-zoon)
         dropZoon3.classList.add('drop-zoon--over');
     })
 
@@ -337,11 +333,9 @@
         dropZoon.classList.remove('drop-zoon--over');
     })
     dropZoon2.addEventListener('dragleave', function () {
-        // Remove Class (drop-zoon--over) from (drop-zoon)
         dropZoon2.classList.remove('drop-zoon--over');
     })
     dropZoon3.addEventListener('dragleave', function () {
-        // Remove Class (drop-zoon--over) from (drop-zoon)
         dropZoon3.classList.remove('drop-zoon--over');
     })
 
@@ -351,11 +345,9 @@
         fileInput.click();
     })
     dropZoon2.addEventListener('click', function () {
-    // Click The (fileInput)
         fileInput2.click();
     })
     dropZoon3.addEventListener('click', function () {
-    // Click The (fileInput)
         fileInput3.click();
     })
 
@@ -367,15 +359,11 @@
         uploadFile(file);
     })
     fileInput2.addEventListener('change', function (event) {
-        // Select The Chosen File
         const file = event.target.files[0];
-        // Call Function uploadFile(), And Send To Her The Chosen File :)
         uploadFile2(file);
     })
     fileInput3.addEventListener('change', function (event) {
-        // Select The Chosen File
         const file = event.target.files[0];
-        // Call Function uploadFile(), And Send To Her The Chosen File :)
         uploadFile3(file);
     })
 
@@ -385,271 +373,7 @@
     now.setSeconds(null)
     
     $('#dateTimePicker2,#dateTimePicker3').val(now.toISOString().slice(0, -1));
-    $('#dateTimePicker').val(subtractHours(now, 1).toISOString().slice(0, -1));
-
-    function subtractHours(date, hours) {
-        date.setHours(date.getHours() - hours);
-
-        return date;
-    }
-
-    // Upload File Function
-    function uploadFile(file) {
-        let that = this;
-        let formData = new FormData()
-        formData.append('image', file)
-        fetch("{% url 'CBG:read_CBG' %}", { 
-            method: 'POST',
-            body: formData 
-        })
-        .then (response => response.json())
-        .then (data => {
-            $('#reading').val(data.reading);
-            $("#measurement").prop('selectedIndex') == 'mgdl' ? 0 : 1;
-            // FileReader()
-            const fileReader = new FileReader();
-            // File Type 
-            const fileType = file.type;
-            // File Size 
-            const fileSize = file.size;
-            // If File Is Passed from the (File Validation) Function
-            if (fileValidate(fileType, fileSize)) {
-                // Add Class (drop-zoon--Uploaded) on (drop-zoon)
-                dropZoon.classList.add('drop-zoon--Uploaded');
-                // Show Loading-text
-                loadingText.style.display = "block";
-                // Hide Preview Image
-                previewImage.style.display = 'none';
-                // Remove Class (uploaded-file--open) From (uploadedFile)
-                uploadedFile.classList.remove('uploaded-file--open');
-                // Remove Class (uploaded-file__info--active) from (uploadedFileInfo)
-                uploadedFileInfo.classList.remove('uploaded-file__info--active');
-                // After File Reader Loaded 
-                fileReader.addEventListener('load', function () {
-                // After Half Second 
-                    setTimeout(function () {
-                            // Add Class (upload-area--open) On (uploadArea)
-                            uploadArea.classList.add('upload-area--open');
-                            // Hide Loading-text (please-wait) Element
-                            loadingText.style.display = "none";
-                            // Show Preview Image
-                            previewImage.style.display = 'block';
-                            // Add Class (file-details--open) On (fileDetails)
-                            fileDetails.classList.add('file-details--open');
-                            // Add Class (uploaded-file--open) On (uploadedFile)
-                            uploadedFile.classList.add('uploaded-file--open');
-                            // Add Class (uploaded-file__info--active) On (uploadedFileInfo)
-                            uploadedFileInfo.classList.add('uploaded-file__info--active');
-                        }, 500) // 0.5s
-                        // Add The (fileReader) Result Inside (previewImage) Source
-                        previewImage.setAttribute('src', fileReader.result);
-                        // Add File Name Inside Uploaded File Name
-                        uploadedFileName.innerHTML = file.name;
-                        // Call Function progressMove();
-                        progressMove();
-                    })
-                    // Read (file) As Data Url 
-                    fileReader.readAsDataURL(file);
-                } else { // Else
-                    this; // (this) Represent The fileValidate(fileType, fileSize) Function
-                }            
-        })
-        .catch(error => {
-            alert("Unable to get reading from your BEFORE MEAL picture, please try another image thank you!")
-        })
-    }
-    function uploadFile2(file) {
-        // FileReader()
-        const fileReader = new FileReader();
-        // File Type 
-        const fileType = file.type;
-        // File Size 
-        const fileSize = file.size;
-        // If File Is Passed from the (File Validation) Function
-        if (fileValidate(fileType, fileSize)) {
-            // Add Class (drop-zoon--Uploaded) on (drop-zoon)
-            dropZoon2.classList.add('drop-zoon--Uploaded');
-            // Show Loading-text
-            loadingText2.style.display = "block";
-            // Hide Preview Image
-            previewImage2.style.display = 'none';
-            // Remove Class (uploaded-file--open) From (uploadedFile)
-            uploadedFile2.classList.remove('uploaded-file--open');
-            // Remove Class (uploaded-file__info--active) from (uploadedFileInfo)
-            uploadedFileInfo2.classList.remove('uploaded-file__info--active');
-            // After File Reader Loaded 
-            fileReader.addEventListener('load', function () {
-            // After Half Second 
-                setTimeout(function () {
-                        // Add Class (upload-area--open) On (uploadArea)
-                        uploadArea2.classList.add('upload-area--open');
-                        // Hide Loading-text (please-wait) Element
-                        loadingText2.style.display = "none";
-                        // Show Preview Image
-                        previewImage2.style.display = 'block';
-                        // Add Class (file-details--open) On (fileDetails)
-                        fileDetails2.classList.add('file-details--open');
-                        // Add Class (uploaded-file--open) On (uploadedFile)
-                        uploadedFile2.classList.add('uploaded-file--open');
-                        // Add Class (uploaded-file__info--active) On (uploadedFileInfo)
-                        uploadedFileInfo2.classList.add('uploaded-file__info--active');
-                    }, 500) // 0.5s
-                    // Add The (fileReader) Result Inside (previewImage) Source
-                    previewImage2.setAttribute('src', fileReader.result);
-                    // Add File Name Inside Uploaded File Name
-                    uploadedFileName2.innerHTML = file.name;
-                    // Call Function progressMove();
-                    progressMove2();
-                })
-                // Read (file) As Data Url 
-                fileReader.readAsDataURL(file);
-            } else { // Else
-                this; // (this) Represent The fileValidate(fileType, fileSize) Function
-            }
-    }
-    function uploadFile3(file) {
-        let formData = new FormData()
-        formData.append('image', file)
-        fetch("{% url 'CBG:read_CBG' %}", { 
-            method: 'POST',
-            body: formData 
-        })
-        .then (response => response.json())
-        .then (data => {
-            $('#reading6').val(data.reading);
-            $("#measurement").prop('selectedIndex') == 'mgdl' ? 0 : 1;
-            // FileReader()
-            const fileReader = new FileReader();
-            // File Type 
-            const fileType = file.type;
-            // File Size 
-            const fileSize = file.size;
-            // If File Is Passed from the (File Validation) Function
-            if (fileValidate(fileType, fileSize)) {
-                // Add Class (drop-zoon--Uploaded) on (drop-zoon)
-                dropZoon3.classList.add('drop-zoon--Uploaded');
-                // Show Loading-text
-                loadingText3.style.display = "block";
-                // Hide Preview Image
-                previewImage3.style.display = 'none';
-                // Remove Class (uploaded-file--open) From (uploadedFile)
-                uploadedFile3.classList.remove('uploaded-file--open');
-                // Remove Class (uploaded-file__info--active) from (uploadedFileInfo)
-                uploadedFileInfo3.classList.remove('uploaded-file__info--active');
-                // After File Reader Loaded 
-                fileReader.addEventListener('load', function () {
-                // After Half Second 
-                    setTimeout(function () {
-                            // Add Class (upload-area--open) On (uploadArea)
-                            uploadArea3.classList.add('upload-area--open');
-                            // Hide Loading-text (please-wait) Element
-                            loadingText3.style.display = "none";
-                            // Show Preview Image
-                            previewImage3.style.display = 'block';
-                            // Add Class (file-details--open) On (fileDetails)
-                            fileDetails3.classList.add('file-details--open');
-                            // Add Class (uploaded-file--open) On (uploadedFile)
-                            uploadedFile3.classList.add('uploaded-file--open');
-                            // Add Class (uploaded-file__info--active) On (uploadedFileInfo)
-                            uploadedFileInfo3.classList.add('uploaded-file__info--active');
-                        }, 500) // 0.5s
-                        // Add The (fileReader) Result Inside (previewImage) Source
-                        previewImage3.setAttribute('src', fileReader.result);
-                        // Add File Name Inside Uploaded File Name
-                        uploadedFileName3.innerHTML = file.name;
-                        // Call Function progressMove();
-                        progressMove3();
-                    })
-                    // Read (file) As Data Url 
-                    fileReader.readAsDataURL(file);
-            } else { // Else
-                this; // (this) Represent The fileValidate(fileType, fileSize) Function
-            }
-        })
-        .catch(error => {
-            alert("Unable to get reading from your AFTER MEAL picture, please try another image thank you!")
-        })        
-    }
-
-    // Progress Counter Increase Function
-    function progressMove() {
-        // Counter Start
-        let counter = 0;
-        // After 600ms 
-        setTimeout(() => {
-            // Every 100ms
-            let counterIncrease = setInterval(() => {
-            // If (counter) is equle 100 
-            if (counter === 100) {
-                // Stop (Counter Increase)
-                clearInterval(counterIncrease);
-            } else { // Else
-                // plus 10 on counter
-                counter = counter + 10;
-                // add (counter) vlaue inisde (uploadedFileCounter)
-                uploadedFileCounter.innerHTML = `${counter}%`
-            }
-            }, 100)
-        }, 600)
-    }
-    function progressMove2() {
-        // Counter Start
-        let counter = 0;
-        // After 600ms 
-        setTimeout(() => {
-            // Every 100ms
-            let counterIncrease = setInterval(() => {
-            // If (counter) is equle 100 
-            if (counter === 100) {
-                // Stop (Counter Increase)
-                clearInterval(counterIncrease);
-            } else { // Else
-                // plus 10 on counter
-                counter = counter + 10;
-                // add (counter) vlaue inisde (uploadedFileCounter)
-                uploadedFileCounter2.innerHTML = `${counter}%`
-            }
-            }, 100)
-        }, 600)
-    }
-    function progressMove3() {
-        // Counter Start
-        let counter = 0;
-        // After 600ms 
-        setTimeout(() => {
-            // Every 100ms
-            let counterIncrease = setInterval(() => {
-            // If (counter) is equle 100 
-            if (counter === 100) {
-                // Stop (Counter Increase)
-                clearInterval(counterIncrease);
-            } else { // Else
-                // plus 10 on counter
-                counter = counter + 10;
-                // add (counter) vlaue inisde (uploadedFileCounter)
-                uploadedFileCounter3.innerHTML = `${counter}%`
-            }
-            }, 100)
-        }, 600)
-    }
-
-    // Simple File Validate Function
-    function fileValidate(fileType, fileSize) {
-        // File Type Validation
-        let isImage = imagesTypes.filter((type) => fileType.indexOf(`image/${type}`) !== -1);
-        // If The Uploaded File Is An Image
-        if (isImage.length !== 0) {
-            // Check, If File Size Is 2MB or Less
-            if (fileSize <= 3000000) { // 3MB :)
-                return true;
-            } else { // Else File Size
-                return alert('Please Your File Should be 2 Megabytes or Less');
-            }
-        } else { // Else File Type 
-            return alert('Please make sure to upload An Image File Type');
-        }
-    }
-    // :)
+    $('#dateTimePicker').val(subtractHours(now, 2).toISOString().slice(0, -1));
 
     $('form').on('submit', function(event) {
         var input_lst = [
@@ -677,18 +401,28 @@
 
     const teleToken = $("#TELE_TOKEN").val();
     const chatID = $("#CHAT_ID").val();
-    const telegramURL = 'https://api.telegram.org/bot'
+    const telegramURL = 'https://api.telegram.org/bot';
 
-    function reminderTeleMsg(){
-        let message = "Have you submitted your CBG reading for today?"
-        axios.post(telegramURL + teleToken + '/sendMessage?chat_id=' + chatID +'&text='+ message)
-        .then(function (response) {
-            console.log(response);
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
+    var readings = {{readings|safe}}
+    var cbg_datetime = {{cbg_datetime|safe}}
+    // console.log(readings)
+    // console.log(cbg_datetime)
+
+    logBook = {}
+    temp = []
+    for (let i = 0; i < cbg_datetime.length; i++){
+        dateKey = cbg_datetime[i].split(',')[0]
+        if (logBook[dateKey] == undefined){
+            logBook[dateKey] = []
+        }
+        logBook[dateKey].push(readings[i])
     }
+
+    console.log(logBook[Object.keys(logBook)[Object.keys(logBook).length - 1]])
+    checkStatsForToday(logBook[Object.keys(logBook)[Object.keys(logBook).length - 1]]); //Gets last record, supposingly today
+    //https://www.diabetes.co.uk/diabetes_care/blood-sugar-level-ranges.html
+
+//Functions can all be found in ../static/CBG/js/script.js
 </script>
 {% endblock %}
 
