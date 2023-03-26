@@ -1,0 +1,107 @@
+.title {
+    font-weight: bold;
+}
+
+/* General Styles */
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --clr-white: rgb(255, 255, 255);
+    --clr-black: rgb(0, 0, 0);
+    --clr-light: rgb(245, 248, 255);
+    --clr-light-gray: rgb(196, 195, 196);
+    --clr-blue: rgb(63, 134, 255);
+    --clr-light-blue: rgb(171, 202, 255);
+}
+
+#dashboard{
+    margin: 0;
+    padding: 0;
+    background-color: var(--clr-light);
+    color: var(--clr-black);
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.125rem;
+}
+
+.boxStyle {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.manualFormBox{
+    margin-top: 25px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.formFields{
+    margin: 0 10px;
+    width: 100px;
+}
+
+.header{
+    padding: 25px 0;
+    text-align: center;
+}
+
+.menu-aligner{
+    display: flex;
+    padding: 0 20px;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-link{
+    padding: 0.5rem 0.25rem !important;
+}
+
+.toast{
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    margin:20px;
+}
+
+/* End General Styles */
+
+/* Dashboard Area */
+.dashboard_area {
+    width: 95%;
+    margin: auto;
+    max-width: 99%;
+    background-color: var(--clr-white);
+    border: 2px solid var(--clr-light-blue);
+    box-shadow: 0 10px 60px rgb(218, 229, 255);
+    border-radius: 24px;
+    padding: 1rem 0rem 1.5rem 0rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.chart_area {
+    display: block;
+    margin: auto;
+    width: 90%;
+    max-height: 95%;
+    max-width: 95%;
+    padding-bottom: 0.5rem;
+}
+
+.solid_line {
+    border-right: 2px dashed var(--clr-light-blue);
+}
+
+.piechart {
+    max-height: 50vh;
+}
+
+.logbook {
+    max-width: 95%;
+    margin: auto;
+    text-align: center;
+}
+/* End Dashboard Area */

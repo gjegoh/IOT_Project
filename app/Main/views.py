@@ -3,27 +3,34 @@ from .forms import *
 from django.contrib import messages
 from django.contrib.auth import login as login_f, authenticate, logout as logout_f
 from django.contrib.auth.forms import AuthenticationForm
+from CBG.models import CBG_Food_Record
 import datetime
 from pytz import timezone
 
 # endpoint to render index page for all users
 def index(request):
     if request.method == 'GET':
-        # query_set = CBG_Reading.objects.all().order_by('Reading_Uploaded_At__minute')
+        query_set = CBG_Food_Record.objects.all().order_by('Before_CBG_Uploaded_At__minute')
         readings = []
         measurements = []
-        datetime = []
-        # for i in query_set:
-        #     readings.append(i.Reading)
-        #     measurements.append(i.Measurement)
-        #     datetime.append(i.Reading_Uploaded_At.astimezone(timezone('Asia/Singapore')).strftime("%Y/%m/%d, %H:%M"))
+        foodnames = []
+        cbg_datetime = []
+        for i in query_set:
+            readings.append(i.Before_CBG_Reading)
+            readings.append(i.After_CBG_Reading)
+            measurements.append(i.Before_CBG_Measurement)
+            measurements.append(i.After_CBG_Measurement)
+            foodnames.append(i.Food_Name)
+            cbg_datetime.append(i.Before_CBG_Uploaded_At.astimezone(timezone('Asia/Singapore')).strftime("%Y/%m/%d, %H:%M"))
+            cbg_datetime.append(i.After_CBG_Uploaded_At.astimezone(timezone('Asia/Singapore')).strftime("%Y/%m/%d, %H:%M"))
         return render(
             request,
             'Main/index.html',
             context={
                 'readings': readings,
                 'measurements': measurements,
-                'datetime': datetime
+                'foodnames': foodnames,
+                'cbg_datetime': cbg_datetime
             }
         )
 

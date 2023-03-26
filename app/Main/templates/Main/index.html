@@ -7,10 +7,76 @@
 
 {% block body %}
 {% if user.is_authenticated %}
-    <h1>Index Page</h1>
-    <p>Hi {{ user.username }}!</p>
-    <p><a href="{% url 'CBG:upload_CBG' %}">Upload Readings</a></p>
-    <p><a href="{% url 'Main:logout' %}">Log Out</a></p>
+<div id="dashboard">
+    <!-- Navbar -->
+    <div class="header">
+        <p class="display-4 fw-bolder">Diabreezy Dashboard</p>
+        <nav class="navbar navbar-expand-lg navbar-light justify-content-center">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
+                <ul class="navbar-nav">
+                    <li class="nav-item menu-aligner">
+                        <i class="fa-solid fa-upload"></i>
+                        <a href="{% url 'CBG:upload_CBG' %}" class="nav-link">Upload Readings</a>
+                    </li>
+                    <li class="nav-item menu-aligner">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <a href="{% url 'Main:logout' %}" class="nav-link">Log Out</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <!-- <h4>Welcome {{ user.username }} </h4> -->
+    </div>
+    <!-- End of Navbar -->
+
+    <!-- Start of Dashboard -->
+    <div class="dashboard_area">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-6 mx-auto solid_line">
+                    <h3>Glucose Reading Chart</h3>
+                    <canvas id="myChart" class="chart_area"></canvas>
+                    <section class="buttons"></section>
+                </div>
+                <div class="col-6 mx-auto">
+                    <h3>Before & After Meals</h3>
+                    <canvas id="myChart2" class="chart_area"></canvas>
+                    <section class="buttons"></section>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard_area">
+        <div class="row">
+            <div class="col-6 mx-auto solid_line piechart">
+                <h3>Food Intake Macros</h3>
+                <canvas id="myChart3" class="chart_area"></canvas>
+                <section class="buttons"></section>
+            </div>
+            <div class="col-6 mx-auto">
+                <h3>Diabreezy Logbook</h3>
+                <table class="table table-hover logbook">
+                    <thead>
+                        <tr>
+                            <th>Food Name</th>
+                            <th>Change in Reading</th>
+                        </tr>
+                        <tr>
+                            <td>Nuggets</td>
+                            <td>0.5</td>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- End of Dashboard -->
+
+</div>
+
 {% else %}
 <h1>Index Page</h1>
     <p>You are not logged in</p>
@@ -20,6 +86,229 @@
 <script>
     var readings = {{readings|safe}}
     var measurements = {{measurements|safe}}
-    var datetime = {{datetime|safe}}
+    var foodnames = {{foodnames|safe}}
+    var cbg_datetime = {{cbg_datetime|safe}}
+    console.log(readings)
+    // const trendline = [10,10,10,10,10,10,10,10,10,10,10]
+
+    // Simulate Daily Reading
+    const xValues = [50,60,70,80,90,100,110,120,130,140,150];
+    const yValues = [7,8,8,9,9,9,10,11,14,14,15];
+
+    // Simulate Weekly Reading
+    const xValues2 = [70,80,90,100,110,120,130,140,150,160,170]
+    const yValues2 = [15,14,14,11,10,9,9,9,9,8,8,7]
+
+    d = new Date()
+    if(d.getMonth() < 10 && d.getDate() < 10) {
+        today = d.getFullYear() + '/0' + parseInt(d.getMonth() + 1)  + '/0' + d.getDate()
+    } else if(d.getMonth() < 10) {
+        today = d.getFullYear() + '/0' + parseInt(d.getMonth() + 1)  + '/' + d.getDate()
+    } else if(d.getDate() < 10) {
+        today = d.getFullYear() + '/' + d.getMonth()  + '/0' + d.getDate()
+    } else {
+        today = d.getFullYear() + '/' + d.getMonth()  + '/' + d.getDate()
+    }
+
+    var today_readings = []
+    var today_datetime = []
+
+    for (let i = 0; i < cbg_datetime.length; i++) {
+        if(cbg_datetime[i].slice(0, 10) == today) {
+            today_readings.push(readings[i])
+            today_datetime.push(cbg_datetime[i])
+        }
+    }
+
+    var weeklydates = []
+
+    for (let i = 0; i < 7; i++ ) {
+        if (parseInt(d.getDate() - i) < 10) { 
+            weeklydates.push(d.getFullYear() + '/0' + parseInt(d.getMonth() + 1) + '/0' + parseInt(d.getDate() - i))
+        } else {
+            weeklydates.push(d.getFullYear() + '/0' + parseInt(d.getMonth() + 1) + '/' + parseInt(d.getDate() - i))
+        }
+    }
+    
+    halfweekly_readings = []
+    halfweekly_datetime = []
+
+    const actions = [
+    {
+        name: "Today",
+        handler(chart) {
+            console.log(chart.data)
+            chart.data.labels = today_datetime;
+            const newDataset = {
+                data: today_readings,
+                borderColor: "rgb(75, 192, 192)"
+            };
+            chart.data.datasets.pop()
+            chart.data.datasets.push(newDataset)
+            chart.update();
+        }
+    },
+    {
+        name: "Past 3 Days",
+        handler(chart) {
+            console.log(chart.data)
+            chart.data.labels = datetime;
+            const newDataset = {
+                label: 'Glucose Reading',
+                data: readings,
+                borderColor: "rgb(75, 192, 192)"
+            };
+            chart.data.datasets.pop()
+            chart.data.datasets.push(newDataset)
+            chart.update();
+        }
+    },
+    {
+        name: "Past Week",
+        handler(chart) {
+            console.log(chart.data)
+            chart.data.labels = datetime;
+            const newDataset = {
+                label: 'Glucose Reading',
+                data: readings,
+                borderColor: "rgb(75, 192, 192)"
+            };
+            chart.data.datasets.pop()
+            chart.data.datasets.push(newDataset)
+            chart.update();
+        }
+    }];
+
+    actions.forEach((a, i) => {
+        let button = document.createElement("button");
+        button.id = "button"+i;
+        button.innerText = a.name;
+        button.classList.add('btn')
+        button.classList.add('btn-outline-success')
+        button.classList.add('mr-2')
+        button.onclick = () => a.handler(myChart);
+        document.querySelector(".buttons").appendChild(button);
+    });
+    
+    const data = {
+        labels: cbg_datetime,
+        datasets: [
+            {
+                label: 'Glucose Reading',
+                data: readings,
+                fill: false,
+                lineTension: 0.1,
+                borderColor: "rgb(75, 192, 192)"
+            },
+        ]
+    };
+
+    let config = {
+        type: "line",
+        data,
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: {
+                    display: true,
+                    text: 'Timestamp'
+                    }
+                },
+                y: {
+                    title: {
+                    display: true,
+                    text: measurements[0]
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+            }
+        }
+    }
+
+    const ctx = document.getElementById("myChart")
+    let myChart = new Chart(ctx, config)
+
+    const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July']
+    const data2 = {
+        labels: labels,
+        datasets: [{
+        label: 'My First Dataset',
+        data: [65, 59, 80, 81, 56, 55, 40],
+        backgroundColor: [
+            'rgba(255, 99, 132, 0.2)',
+            'rgba(255, 159, 64, 0.2)',
+            'rgba(255, 205, 86, 0.2)',
+            'rgba(75, 192, 192, 0.2)',
+            'rgba(54, 162, 235, 0.2)',
+            'rgba(153, 102, 255, 0.2)',
+            'rgba(201, 203, 207, 0.2)'
+        ],
+        borderColor: [
+            'rgb(255, 99, 132)',
+            'rgb(255, 159, 64)',
+            'rgb(255, 205, 86)',
+            'rgb(75, 192, 192)',
+            'rgb(54, 162, 235)',
+            'rgb(153, 102, 255)',
+            'rgb(201, 203, 207)'
+        ],
+        borderWidth: 1
+        }]
+    };
+    
+    new Chart("myChart2", {
+        type: 'bar',
+        data: data2,
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                title: {
+                    display: true,
+                    text: 'Glucose Reading Chart'
+                },
+        }
+        },
+    });
+
+    var xValues3 = ["Italy", "France", "Spain", "USA", "Argentina"];
+    var yValues3 = [55, 49, 44, 24, 15];
+    var barColors = [
+        "#b91d47",
+        "#00aba9",
+        "#2b5797",
+        "#e8c3b9",
+        "#1e7145"
+    ];
+    new Chart("myChart3", {
+        type: "pie",
+        data: {
+            labels: xValues3,
+            datasets: [{
+            backgroundColor: barColors,
+            data: yValues3
+            }]
+        },
+        options: {
+            responsive: true,
+            title: {
+            display: true,
+            text: "World Wide Wine Production"
+            }
+        }
+    });
 </script>
+
 {% endblock %}
