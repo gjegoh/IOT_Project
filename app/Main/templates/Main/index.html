@@ -44,7 +44,7 @@
                 <div class="col-6 mx-auto">
                     <h3>Before & After Meals</h3>
                     <canvas id="myChart2" class="chart_area"></canvas>
-                    <section class="buttons"></section>
+                    <section class="dropdown"></section>
                 </div>
             </div>
         </div>
@@ -88,16 +88,6 @@
     var measurements = {{measurements|safe}}
     var foodnames = {{foodnames|safe}}
     var cbg_datetime = {{cbg_datetime|safe}}
-    console.log(readings)
-    // const trendline = [10,10,10,10,10,10,10,10,10,10,10]
-
-    // Simulate Daily Reading
-    const xValues = [50,60,70,80,90,100,110,120,130,140,150];
-    const yValues = [7,8,8,9,9,9,10,11,14,14,15];
-
-    // Simulate Weekly Reading
-    const xValues2 = [70,80,90,100,110,120,130,140,150,160,170]
-    const yValues2 = [15,14,14,11,10,9,9,9,9,8,8,7]
 
     d = new Date()
     if(d.getMonth() < 10 && d.getDate() < 10) {
@@ -120,24 +110,54 @@
         }
     }
 
-    var weeklydates = []
+    var weekly_dates = []
 
     for (let i = 0; i < 7; i++ ) {
         if (parseInt(d.getDate() - i) < 10) { 
-            weeklydates.push(d.getFullYear() + '/0' + parseInt(d.getMonth() + 1) + '/0' + parseInt(d.getDate() - i))
+            weekly_dates.push(d.getFullYear() + '/0' + parseInt(d.getMonth() + 1) + '/0' + parseInt(d.getDate() - i))
         } else {
-            weeklydates.push(d.getFullYear() + '/0' + parseInt(d.getMonth() + 1) + '/' + parseInt(d.getDate() - i))
+            weekly_dates.push(d.getFullYear() + '/0' + parseInt(d.getMonth() + 1) + '/' + parseInt(d.getDate() - i))
         }
     }
-    
+
+    weekly_readings = []
+    weekly_datetime = []
+
+    for (eachdate of weekly_dates) {
+        for (let i = 0; i < cbg_datetime.length; i++) {
+            if(cbg_datetime[i].slice(0, 10) == eachdate) {
+                weekly_readings.push(readings[i])
+                weekly_datetime.push(cbg_datetime[i])
+            }
+        }
+    }
+
+    var halfweekly_dates = []
+
+    for (let i = 0; i < 3; i++ ) {
+        if (parseInt(d.getDate() - i) < 10) { 
+            halfweekly_dates.push(d.getFullYear() + '/0' + parseInt(d.getMonth() + 1) + '/0' + parseInt(d.getDate() - i))
+        } else {
+            halfweekly_dates.push(d.getFullYear() + '/0' + parseInt(d.getMonth() + 1) + '/' + parseInt(d.getDate() - i))
+        }
+    }
+
     halfweekly_readings = []
     halfweekly_datetime = []
+
+    for (eachdate of halfweekly_dates) {
+        for (let i = 0; i < cbg_datetime.length; i++) {
+            if(cbg_datetime[i].slice(0, 10) == eachdate) {
+                halfweekly_readings.push(readings[i])
+                halfweekly_datetime.push(cbg_datetime[i])
+            }
+        }
+    }
 
     const actions = [
     {
         name: "Today",
         handler(chart) {
-            console.log(chart.data)
             chart.data.labels = today_datetime;
             const newDataset = {
                 data: today_readings,
@@ -151,11 +171,9 @@
     {
         name: "Past 3 Days",
         handler(chart) {
-            console.log(chart.data)
-            chart.data.labels = datetime;
+            chart.data.labels = halfweekly_datetime;
             const newDataset = {
-                label: 'Glucose Reading',
-                data: readings,
+                data: halfweekly_readings,
                 borderColor: "rgb(75, 192, 192)"
             };
             chart.data.datasets.pop()
@@ -167,10 +185,9 @@
         name: "Past Week",
         handler(chart) {
             console.log(chart.data)
-            chart.data.labels = datetime;
+            chart.data.labels = weekly_datetime;
             const newDataset = {
-                label: 'Glucose Reading',
-                data: readings,
+                data: weekly_readings,
                 borderColor: "rgb(75, 192, 192)"
             };
             chart.data.datasets.pop()
@@ -191,11 +208,11 @@
     });
     
     const data = {
-        labels: cbg_datetime,
+        labels: halfweekly_datetime,
         datasets: [
             {
                 label: 'Glucose Reading',
-                data: readings,
+                data: halfweekly_readings,
                 fill: false,
                 lineTension: 0.1,
                 borderColor: "rgb(75, 192, 192)"
@@ -233,32 +250,39 @@
     const ctx = document.getElementById("myChart")
     let myChart = new Chart(ctx, config)
 
-    const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July']
+    const labels = today_datetime
     const data2 = {
         labels: labels,
         datasets: [{
-        label: 'My First Dataset',
-        data: [65, 59, 80, 81, 56, 55, 40],
-        backgroundColor: [
-            'rgba(255, 99, 132, 0.2)',
-            'rgba(255, 159, 64, 0.2)',
-            'rgba(255, 205, 86, 0.2)',
-            'rgba(75, 192, 192, 0.2)',
-            'rgba(54, 162, 235, 0.2)',
-            'rgba(153, 102, 255, 0.2)',
-            'rgba(201, 203, 207, 0.2)'
-        ],
-        borderColor: [
-            'rgb(255, 99, 132)',
-            'rgb(255, 159, 64)',
-            'rgb(255, 205, 86)',
-            'rgb(75, 192, 192)',
-            'rgb(54, 162, 235)',
-            'rgb(153, 102, 255)',
-            'rgb(201, 203, 207)'
-        ],
-        borderWidth: 1
-        }]
+            label: 'Glucose Reading',
+            data: today_readings,
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 159, 64, 0.2)',
+                'rgba(255, 205, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(201, 203, 207, 0.2)'
+            ],
+            borderColor: [
+                'rgb(255, 99, 132)',
+                'rgb(255, 159, 64)',
+                'rgb(255, 205, 86)',
+                'rgb(75, 192, 192)',
+                'rgb(54, 162, 235)',
+                'rgb(153, 102, 255)',
+                'rgb(201, 203, 207)'
+            ],
+            borderWidth: 1
+        }],
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: false
+                }
+            }
+        }
     };
     
     new Chart("myChart2", {
