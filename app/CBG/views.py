@@ -19,16 +19,16 @@ def upload_CBG(request):
             User=user,
             Before_CBG_Reading=request.POST.get('reading'),
             Before_CBG_Measurement=request.POST.get('measurement'),
-            Before_CBG_Uploaded_At=request.POST.get('uploadTime'),
+            Before_CBG_Uploaded_At=request.POST.get('datetimepicker'),
             Food_Name=request.POST.get('reading7'),
             Food_Calorie=request.POST.get('reading2'),
             Food_Carb=request.POST.get('reading3'),
             Food_Sugar=request.POST.get('reading4'),
             Food_Fibre=request.POST.get('reading5'),
-            Food_Uploaded_At=request.POST.get('uploadTime2'),
+            Food_Uploaded_At=request.POST.get('datetimepicker2'),
             After_CBG_Reading=request.POST.get('reading6'),
             After_CBG_Measurement=request.POST.get('measurement2'),
-            After_CBG_Uploaded_At=request.POST.get('uploadTime3'),
+            After_CBG_Uploaded_At=request.POST.get('datetimepicker3'),
         )
         return HttpResponseRedirect('/') 
     return render(request, 'CBG/upload_CBG.html', context={
@@ -43,7 +43,7 @@ def read_CBG(request):
         cbg_image = CBG_Image.objects.create(
             Image= request.FILES.get("image")
         )
-        cbg_pipeline = Process_CBG()   
+        cbg_pipeline = Process_CBG()
         reading, measurement = cbg_pipeline.get_Reading(cbg_image.Image.path)
         cbg_image.delete()
         return JsonResponse({

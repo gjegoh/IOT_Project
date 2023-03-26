@@ -10,7 +10,7 @@
 <div id="uploadCBGMain">
     <!-- Navbar -->
     <div class="header">
-        <h1>Upload Reading Page</h1>
+        <h1>Upload Page</h1>
         <nav class="navbar navbar-expand-lg navbar-light justify-content-center">
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -41,8 +41,7 @@
                         <div id="uploadArea" class="upload-area">
                             <!-- Header -->
                             <div class="upload-area__header">
-                                <h1 class="upload-area__title"><span class="badge badge-primary">1</span> Upload CBG Reading (Before Meal)</h1>
-                                <input id="uploadTime" name="uploadTime" type="hidden" value="" />
+                                <h1 class="upload-area__title"><span class="badge badge-primary">1</span> CBG Reading <br> (Before Meal)</h1>
                                 <p class="upload-area__paragraph">
                                 File should be an image
                                 <strong class="upload-area__tooltip">
@@ -84,13 +83,13 @@
                             <!-- End File Details -->
             
                             <div class="mt-3">
-                                <input type="datetime-local" id="dateTimePicker">
+                                <input type="datetime-local" id="dateTimePicker" name="datetimepicker" value="">
                             </div>
             
                             <div class="manualFormBox">
                                 <div class="form-group formFields">
                                     <label for="reading">Reading</label>
-                                    <input id="reading" name="reading" type="number" class="form-control" step=".1">
+                                    <input id="reading" name="reading" type="number" class="form-control">
                                 </div>
                                 <div class="form-group formFields">
                                     <label for="measurement">Units</label>
@@ -106,8 +105,8 @@
                         <div id="uploadArea2" class="upload-area">
                             <!-- Header -->
                             <div class="upload-area__header">
-                                <h1 class="upload-area__title"><span class="badge badge-primary">2</span> Upload Food Image</h1>
-                                <input id="uploadTime2" name="uploadTime2" type="hidden" value="" />
+                                <h1 class="upload-area__title"><span class="badge badge-primary">2</span> Food Image</h1>
+    
                                 <p class="upload-area__paragraph">
                                 File should be an image
                                 <strong class="upload-area__tooltip">
@@ -149,7 +148,7 @@
                             <!-- End File Details -->
             
                             <div class="mt-3">
-                                <input type="datetime-local" id="dateTimePicker2">
+                                <input type="datetime-local" id="dateTimePicker2" name="datetimepicker2" value="">
                             </div>
             
                             <div class="manualFormBox">
@@ -172,17 +171,15 @@
                                 </div>
                             </div>
                             <br>
-                            <label for="reading7">Name</label>
-                            <input id="reading7" name="reading7" type="text" class="form-control">
-            
+                            <!-- <label for="reading7">Name</label> -->
+                            <input id="reading7" name="reading7" type="text" class="form-control" placeholder="Enter food here!">
                         </div>
                     </div>
                     <div class="col d-flex justify-content-start">
                         <div id="uploadArea3" class="upload-area">
                             <!-- Header -->
                             <div class="upload-area__header">
-                                <h1 class="upload-area__title"><span class="badge badge-primary">3</span> Upload CBG Reading (After Meal)</h1>
-                                <input id="uploadTime3" name="uploadTime3" type="hidden" value="" />
+                                <h1 class="upload-area__title"><span class="badge badge-primary">3</span> CBG Reading <br> (After Meal)</h1>
                                 <p class="upload-area__paragraph">
                                 File should be an image
                                 <strong class="upload-area__tooltip">
@@ -224,7 +221,7 @@
                             <!-- End File Details -->
             
                             <div class="mt-3">
-                                <input type="datetime-local" id="dateTimePicker3">
+                                <input type="datetime-local" id="dateTimePicker3" name="datetimepicker3" value="" >
                             </div>
             
                             <div class="manualFormBox">
@@ -240,10 +237,11 @@
                                     </select>
                                 </div>
                             </div>
-            
-                            <button id="submitBtn" onclick="getLocalTime()" class="mt-3 btn btn-primary" type="submit">Upload</button>
                         </div>
                     </div>
+                </div>
+                <div class="text-center">
+                    <button id="submitBtn" class="mt-3 btn btn-primary" type="submit">Upload</button>
                 </div>
             </div>
         </form>
@@ -264,9 +262,6 @@
 {% endif %}
 </div>
 <script>
-    // Design By
-    // - https://codepen.io/Ali-Majed/pen/BaRoyrG
-
     // Select Upload-Area
     const uploadArea = document.querySelector('#uploadArea');
     const uploadArea2 = document.querySelector('#uploadArea2');
@@ -388,12 +383,19 @@
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     now.setMilliseconds(null)
     now.setSeconds(null)
-    document.getElementById('dateTimePicker').value = now.toISOString().slice(0, -1)
-    document.getElementById('dateTimePicker2').value = now.toISOString().slice(0, -1);
-    document.getElementById('dateTimePicker3').value = now.toISOString().slice(0, -1);
+    
+    $('#dateTimePicker2,#dateTimePicker3').val(now.toISOString().slice(0, -1));
+    $('#dateTimePicker').val(subtractHours(now, 1).toISOString().slice(0, -1));
+
+    function subtractHours(date, hours) {
+        date.setHours(date.getHours() - hours);
+
+        return date;
+    }
 
     // Upload File Function
     function uploadFile(file) {
+        let that = this;
         let formData = new FormData()
         formData.append('image', file)
         fetch("{% url 'CBG:read_CBG' %}", { 
@@ -402,61 +404,59 @@
         })
         .then (response => response.json())
         .then (data => {
-            document.getElementById('reading').value = data.reading
-            if (data.measurement == 'mgdl') {
-                document.getElementById("measurement").selectedIndex = 0
-            }
-            else {
-                document.getElementById("measurement").selectedIndex = 1
-            }
+            $('#reading').val(data.reading);
+            $("#measurement").prop('selectedIndex') == 'mgdl' ? 0 : 1;
+            // FileReader()
+            const fileReader = new FileReader();
+            // File Type 
+            const fileType = file.type;
+            // File Size 
+            const fileSize = file.size;
+            // If File Is Passed from the (File Validation) Function
+            if (fileValidate(fileType, fileSize)) {
+                // Add Class (drop-zoon--Uploaded) on (drop-zoon)
+                dropZoon.classList.add('drop-zoon--Uploaded');
+                // Show Loading-text
+                loadingText.style.display = "block";
+                // Hide Preview Image
+                previewImage.style.display = 'none';
+                // Remove Class (uploaded-file--open) From (uploadedFile)
+                uploadedFile.classList.remove('uploaded-file--open');
+                // Remove Class (uploaded-file__info--active) from (uploadedFileInfo)
+                uploadedFileInfo.classList.remove('uploaded-file__info--active');
+                // After File Reader Loaded 
+                fileReader.addEventListener('load', function () {
+                // After Half Second 
+                    setTimeout(function () {
+                            // Add Class (upload-area--open) On (uploadArea)
+                            uploadArea.classList.add('upload-area--open');
+                            // Hide Loading-text (please-wait) Element
+                            loadingText.style.display = "none";
+                            // Show Preview Image
+                            previewImage.style.display = 'block';
+                            // Add Class (file-details--open) On (fileDetails)
+                            fileDetails.classList.add('file-details--open');
+                            // Add Class (uploaded-file--open) On (uploadedFile)
+                            uploadedFile.classList.add('uploaded-file--open');
+                            // Add Class (uploaded-file__info--active) On (uploadedFileInfo)
+                            uploadedFileInfo.classList.add('uploaded-file__info--active');
+                        }, 500) // 0.5s
+                        // Add The (fileReader) Result Inside (previewImage) Source
+                        previewImage.setAttribute('src', fileReader.result);
+                        // Add File Name Inside Uploaded File Name
+                        uploadedFileName.innerHTML = file.name;
+                        // Call Function progressMove();
+                        progressMove();
+                    })
+                    // Read (file) As Data Url 
+                    fileReader.readAsDataURL(file);
+                } else { // Else
+                    this; // (this) Represent The fileValidate(fileType, fileSize) Function
+                }            
         })
-        // FileReader()
-        const fileReader = new FileReader();
-        // File Type 
-        const fileType = file.type;
-        // File Size 
-        const fileSize = file.size;
-        // If File Is Passed from the (File Validation) Function
-        if (fileValidate(fileType, fileSize)) {
-            // Add Class (drop-zoon--Uploaded) on (drop-zoon)
-            dropZoon.classList.add('drop-zoon--Uploaded');
-            // Show Loading-text
-            loadingText.style.display = "block";
-            // Hide Preview Image
-            previewImage.style.display = 'none';
-            // Remove Class (uploaded-file--open) From (uploadedFile)
-            uploadedFile.classList.remove('uploaded-file--open');
-            // Remove Class (uploaded-file__info--active) from (uploadedFileInfo)
-            uploadedFileInfo.classList.remove('uploaded-file__info--active');
-            // After File Reader Loaded 
-            fileReader.addEventListener('load', function () {
-            // After Half Second 
-                setTimeout(function () {
-                        // Add Class (upload-area--open) On (uploadArea)
-                        uploadArea.classList.add('upload-area--open');
-                        // Hide Loading-text (please-wait) Element
-                        loadingText.style.display = "none";
-                        // Show Preview Image
-                        previewImage.style.display = 'block';
-                        // Add Class (file-details--open) On (fileDetails)
-                        fileDetails.classList.add('file-details--open');
-                        // Add Class (uploaded-file--open) On (uploadedFile)
-                        uploadedFile.classList.add('uploaded-file--open');
-                        // Add Class (uploaded-file__info--active) On (uploadedFileInfo)
-                        uploadedFileInfo.classList.add('uploaded-file__info--active');
-                    }, 500) // 0.5s
-                    // Add The (fileReader) Result Inside (previewImage) Source
-                    previewImage.setAttribute('src', fileReader.result);
-                    // Add File Name Inside Uploaded File Name
-                    uploadedFileName.innerHTML = file.name;
-                    // Call Function progressMove();
-                    progressMove();
-                })
-                // Read (file) As Data Url 
-                fileReader.readAsDataURL(file);
-            } else { // Else
-                this; // (this) Represent The fileValidate(fileType, fileSize) Function
-            }
+        .catch(error => {
+            alert("Unable to get reading from your BEFORE MEAL picture, please try another image thank you!")
+        })
     }
     function uploadFile2(file) {
         // FileReader()
@@ -516,61 +516,59 @@
         })
         .then (response => response.json())
         .then (data => {
-            document.getElementById('reading6').value = data.reading
-            if (data.measurement == 'mgdl') {
-                document.getElementById("measurement2").selectedIndex = 0
-            }
-            else {
-                document.getElementById("measurement2").selectedIndex = 1
-            }
-        })
-        // FileReader()
-        const fileReader = new FileReader();
-        // File Type 
-        const fileType = file.type;
-        // File Size 
-        const fileSize = file.size;
-        // If File Is Passed from the (File Validation) Function
-        if (fileValidate(fileType, fileSize)) {
-            // Add Class (drop-zoon--Uploaded) on (drop-zoon)
-            dropZoon3.classList.add('drop-zoon--Uploaded');
-            // Show Loading-text
-            loadingText3.style.display = "block";
-            // Hide Preview Image
-            previewImage3.style.display = 'none';
-            // Remove Class (uploaded-file--open) From (uploadedFile)
-            uploadedFile3.classList.remove('uploaded-file--open');
-            // Remove Class (uploaded-file__info--active) from (uploadedFileInfo)
-            uploadedFileInfo3.classList.remove('uploaded-file__info--active');
-            // After File Reader Loaded 
-            fileReader.addEventListener('load', function () {
-            // After Half Second 
-                setTimeout(function () {
-                        // Add Class (upload-area--open) On (uploadArea)
-                        uploadArea3.classList.add('upload-area--open');
-                        // Hide Loading-text (please-wait) Element
-                        loadingText3.style.display = "none";
-                        // Show Preview Image
-                        previewImage3.style.display = 'block';
-                        // Add Class (file-details--open) On (fileDetails)
-                        fileDetails3.classList.add('file-details--open');
-                        // Add Class (uploaded-file--open) On (uploadedFile)
-                        uploadedFile3.classList.add('uploaded-file--open');
-                        // Add Class (uploaded-file__info--active) On (uploadedFileInfo)
-                        uploadedFileInfo3.classList.add('uploaded-file__info--active');
-                    }, 500) // 0.5s
-                    // Add The (fileReader) Result Inside (previewImage) Source
-                    previewImage3.setAttribute('src', fileReader.result);
-                    // Add File Name Inside Uploaded File Name
-                    uploadedFileName3.innerHTML = file.name;
-                    // Call Function progressMove();
-                    progressMove3();
-                })
-                // Read (file) As Data Url 
-                fileReader.readAsDataURL(file);
+            $('#reading6').val(data.reading);
+            $("#measurement").prop('selectedIndex') == 'mgdl' ? 0 : 1;
+            // FileReader()
+            const fileReader = new FileReader();
+            // File Type 
+            const fileType = file.type;
+            // File Size 
+            const fileSize = file.size;
+            // If File Is Passed from the (File Validation) Function
+            if (fileValidate(fileType, fileSize)) {
+                // Add Class (drop-zoon--Uploaded) on (drop-zoon)
+                dropZoon3.classList.add('drop-zoon--Uploaded');
+                // Show Loading-text
+                loadingText3.style.display = "block";
+                // Hide Preview Image
+                previewImage3.style.display = 'none';
+                // Remove Class (uploaded-file--open) From (uploadedFile)
+                uploadedFile3.classList.remove('uploaded-file--open');
+                // Remove Class (uploaded-file__info--active) from (uploadedFileInfo)
+                uploadedFileInfo3.classList.remove('uploaded-file__info--active');
+                // After File Reader Loaded 
+                fileReader.addEventListener('load', function () {
+                // After Half Second 
+                    setTimeout(function () {
+                            // Add Class (upload-area--open) On (uploadArea)
+                            uploadArea3.classList.add('upload-area--open');
+                            // Hide Loading-text (please-wait) Element
+                            loadingText3.style.display = "none";
+                            // Show Preview Image
+                            previewImage3.style.display = 'block';
+                            // Add Class (file-details--open) On (fileDetails)
+                            fileDetails3.classList.add('file-details--open');
+                            // Add Class (uploaded-file--open) On (uploadedFile)
+                            uploadedFile3.classList.add('uploaded-file--open');
+                            // Add Class (uploaded-file__info--active) On (uploadedFileInfo)
+                            uploadedFileInfo3.classList.add('uploaded-file__info--active');
+                        }, 500) // 0.5s
+                        // Add The (fileReader) Result Inside (previewImage) Source
+                        previewImage3.setAttribute('src', fileReader.result);
+                        // Add File Name Inside Uploaded File Name
+                        uploadedFileName3.innerHTML = file.name;
+                        // Call Function progressMove();
+                        progressMove3();
+                    })
+                    // Read (file) As Data Url 
+                    fileReader.readAsDataURL(file);
             } else { // Else
                 this; // (this) Represent The fileValidate(fileType, fileSize) Function
             }
+        })
+        .catch(error => {
+            alert("Unable to get reading from your AFTER MEAL picture, please try another image thank you!")
+        })        
     }
 
     // Progress Counter Increase Function
@@ -665,7 +663,7 @@
         ]
         var check_forms = true
         for (var i of input_lst) {
-            if (document.getElementById(i).value == "") {
+            if ($('#' + i).val() == "") {
                 check_forms = false
                 break
             }
@@ -677,21 +675,8 @@
         }
     })
 
-    function getLocalTime(){
-        var tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
-        var dateTimePickerVal = document.getElementById('dateTimePicker').value;
-        var dateTimePickerVal2 = document.getElementById('dateTimePicker2').value;
-        var dateTimePickerVal3 = document.getElementById('dateTimePicker3').value;
-        var localISOTime = dateTimePickerVal ? dateTimePickerVal : (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
-        var localISOTime2 = dateTimePickerVal2 ? dateTimePickerVal2 : (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
-        var localISOTime3 = dateTimePickerVal3 ? dateTimePickerVal3 : (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
-        document.getElementById('uploadTime').value = localISOTime
-        document.getElementById('uploadTime2').value = localISOTime2
-        document.getElementById('uploadTime3').value = localISOTime3
-    }
-
-    const teleToken = document.getElementById("TELE_TOKEN").value;
-    const chatID = document.getElementById("CHAT_ID").value;
+    const teleToken = $("#TELE_TOKEN").val();
+    const chatID = $("#CHAT_ID").val();
     const telegramURL = 'https://api.telegram.org/bot'
 
     function reminderTeleMsg(){
