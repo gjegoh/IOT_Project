@@ -37,13 +37,41 @@
 
 			async function predict() {
 				// predict can take in an image, video or canvas html element
+				var finalClass = "";
+				var finalPrediction = 0;
 				var image = document.getElementById('imagePreview');
 				const prediction = await model.predict(image, false);
 				for (let i = 0; i < maxPredictions; i++) {
-					const classPrediction =
-						prediction[i].className + ': ' + prediction[i].probability.toFixed(2);
-					labelContainer.childNodes[i].innerHTML = classPrediction;
+					//const classPrediction =
+					//	prediction[i].className + ': ' + prediction[i].probability.toFixed(2);
+					//labelContainer.childNodes[i].innerHTML = classPrediction;
+					if (prediction[i].probability.toFixed(2)>finalPrediction){
+						finalPrediction=prediction[i].probability;
+						finalClass = prediction[i].className;
+					}
 				}
+				console.log(finalClass)
+				console.log(finalPrediction)
+				const options = {
+				method: 'GET',
+				headers: {
+							'X-RapidAPI-Key': '81001da94fmsh676baf96bcc26fcp155d7bjsn3e84e084918d',
+							'X-RapidAPI-Host': 'edamam-recipe-search.p.rapidapi.com'
+						}
+					};
+
+		fetch('https://edamam-recipe-search.p.rapidapi.com/search?q='+finalClass, options)
+			.then(response => response.json())
+			.then(response => {console.log(response.hits[0].recipe);
+			console.log(response.hits[0].recipe.totalNutrients.SUGAR.quantity,response.hits[0].recipe.totalNutrients.SUGAR.unit);
+			console.log(response.hits[0].recipe.totalNutrients.CHOCDF.quantity,response.hits[0].recipe.totalNutrients.CHOCDF.unit)
+			console.log(response.hits[0].recipe.totalNutrients.FIBTG.quantity,response.hits[0].recipe.totalNutrients.FIBTG.unit)
+			console.log(response.hits[0].recipe.totalNutrients.ENERC_KCAL.unit,response.hits[0].recipe.totalNutrients.ENERC_KCAL.quantity)
+			//sugar carbs fibre and calories
+			})
+		
+			.catch(err => console.error(err));
+
 			}
 		</script>
 
