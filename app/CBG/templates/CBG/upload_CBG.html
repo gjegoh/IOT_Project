@@ -175,6 +175,10 @@
                             <input id="reading7" name="reading7" type="text" class="form-control" placeholder="Enter food here!">
                         </div>
                     </div>
+
+
+                    <div id="label-container"></div>
+                    
                     <div class="col d-flex justify-content-start">
                         <div id="uploadArea3" class="upload-area">
                             <!-- Header -->
@@ -424,5 +428,93 @@
 
 //Functions can all be found in ../static/CBG/js/script.js
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script>
+    const URL = 'https://teachablemachine.withgoogle.com/models/TqnQPSTyE/';
+
+    let model, labelContainer, maxPredictions;
+
+    // Load the image model 
+    async function init() {
+        const modelURL = URL + 'model.json';
+        const metadataURL = URL + 'metadata.json';
+
+        // load the model and metadata
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
+
+        labelContainer = document.getElementById('label-container');
+        for (let i = 0; i < maxPredictions; i++) {
+            // and class labels
+            labelContainer.appendChild(document.createElement('div'));
+        }
+    }
+
+    async function predict() {
+				// predict can take in an image, video or canvas html element
+				var finalClass = "";
+				var finalPrediction = 0;
+				var image = document.getElementById('previewImage2');
+				const prediction = await model.predict(image, false);
+				for (let i = 0; i < maxPredictions; i++) {
+					//const classPrediction =
+					//	prediction[i].className + ': ' + prediction[i].probability.toFixed(2);
+					//labelContainer.childNodes[i].innerHTML = classPrediction;
+					if (prediction[i].probability.toFixed(2)>finalPrediction){
+						finalPrediction=prediction[i].probability;
+						finalClass = prediction[i].className;
+					}
+				}
+				console.log(finalClass)
+				console.log(finalPrediction)
+				const options = {
+				method: 'GET',
+				headers: {
+							'X-RapidAPI-Key': '81001da94fmsh676baf96bcc26fcp155d7bjsn3e84e084918d',
+							'X-RapidAPI-Host': 'edamam-recipe-search.p.rapidapi.com'
+						}
+					};
+
+		fetch('https://edamam-recipe-search.p.rapidapi.com/search?q='+finalClass, options)
+			.then(response => response.json())
+			.then(response => {console.log(response.hits[0].recipe);
+			console.log(response.hits[0].recipe.totalNutrients.SUGAR.quantity,response.hits[0].recipe.totalNutrients.SUGAR.unit);
+			console.log(response.hits[0].recipe.totalNutrients.CHOCDF.quantity,response.hits[0].recipe.totalNutrients.CHOCDF.unit)
+			console.log(response.hits[0].recipe.totalNutrients.FIBTG.quantity,response.hits[0].recipe.totalNutrients.FIBTG.unit)
+			console.log(response.hits[0].recipe.totalNutrients.ENERC_KCAL.unit,response.hits[0].recipe.totalNutrients.ENERC_KCAL.quantity)
+
+            document.getElementById('reading2').value=response.hits[0].recipe.totalNutrients.ENERC_KCAL.quantity
+            document.getElementById('reading3').value=response.hits[0].recipe.totalNutrients.CHOCDF.quantity
+            document.getElementById('reading4').value=response.hits[0].recipe.totalNutrients.SUGAR.quantity
+            document.getElementById('reading5').value=response.hits[0].recipe.totalNutrients.FIBTG.quantity
+			//sugar carbs fibre and calories
+			})
+		
+			.catch(err => console.error(err));
+
+			}
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#imagePreview').attr('src', e.target.result);
+                    // $('#imagePreview').css('background-image', 'url(' + e.target.result + ')');
+                    $('#imagePreview').hide();
+                    $('#imagePreview').fadeIn(650);
+                };
+                reader.readAsDataURL(input.files[0]);
+                init().then(() => {
+                    predict();
+                });
+            }
+        }
+        $('#fileInput2').change(function () {
+            readURL(this);
+        });
+</script>
+
 {% endblock %}
 
