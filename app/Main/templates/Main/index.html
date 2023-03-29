@@ -10,7 +10,7 @@
 <div id="dashboard">
     <!-- Navbar -->
     <div class="header">
-        <p class="display-4 fw-bolder">Diabreezy Dashboard</p>
+        <p class="display-4"><b>Diabreezy Dashboard</b></p>
         <nav class="navbar navbar-expand-lg navbar-light justify-content-center">
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -37,36 +37,35 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-6 mx-auto solid_line">
-                    <h3>Glucose Reading Chart</h3>
-                    <canvas id="myChart" class="chart_area"></canvas>
-                    <section class="buttons"></section>
+                    <h3><b>Diabreezy Summary</b></h3>
+                    <div class="summary">
+                        <p id="latestreading"><b>Latest Reading: </b></p>
+                        <p id="lastfooditem"><b>Food Consumed: </b></p>
+                        <p id="latestuploaddate"><b>Last Uploaded At: </b></p>
+                    </div>
                 </div>
                 <div class="col-6 mx-auto">
-                    <h3>Before & After Meals</h3>
-                    <canvas id="myChart2" class="chart_area"></canvas>
-                    <section class="dropdown"></section>
+                    <h3><b>Glucose Reading Chart</b></h3>
+                    <canvas id="myChart" class="chart_area"></canvas>
+                    <section class="buttons"></section>
                 </div>
             </div>
         </div>
     </div>
     <div class="dashboard_area">
         <div class="row">
-            <div class="col-6 mx-auto solid_line piechart">
-                <h3>Food Intake Macros</h3>
-                <canvas id="myChart3" class="chart_area"></canvas>
-                <section class="buttons"></section>
+            <div class="col-6 mx-auto solid_line">
+                <h3><b>Weekly Food Nutrients Intake</b></h3>
+                <canvas id="myChart2" class="piechart"></canvas>
+                <section class="buttons2"></section>
             </div>
             <div class="col-6 mx-auto">
-                <h3>Diabreezy Logbook</h3>
-                <table class="table table-hover logbook">
+                <h3><b>Diabreezy Logbook</b></h3>
+                <table class="table table-hover logbook" id="logbook">
                     <thead>
                         <tr>
                             <th>Food Name</th>
                             <th>Change in Reading</th>
-                        </tr>
-                        <tr>
-                            <td>Nuggets</td>
-                            <td>0.5</td>
                         </tr>
                     </thead>
                 </table>
@@ -84,11 +83,21 @@
 {% endif %}
 
 <script>
-    var readings = {{readings|safe}}
-    var measurements = {{measurements|safe}}
-    var foodnames = {{foodnames|safe}}
-    var cbg_datetime = {{cbg_datetime|safe}}
+    var results = {{results|safe}}
+    var food = {{food|safe}}
+    
+    // Diabreezy Summary
+    var latest_reading = results[results.length - 1]['After_CBG_Reading']
+    var latest_datetime = results[results.length - 1]['After_CBG_Uploaded_At']
+    var measurement_unit = results[results.length - 1]['After_CBG_Measurement']
+    var last_fooditem = results[results.length - 1]['Food_Name']
 
+    document.getElementById("latestreading").innerHTML += latest_reading + ' '
+    document.getElementById("latestreading").innerHTML += measurement_unit
+    document.getElementById("lastfooditem").innerHTML += last_fooditem
+    document.getElementById("latestuploaddate").innerHTML += latest_datetime
+
+    // Start of Charts
     d = new Date()
     if(d.getMonth() < 10 && d.getDate() < 10) {
         today = d.getFullYear() + '/0' + parseInt(d.getMonth() + 1)  + '/0' + d.getDate()
@@ -100,16 +109,18 @@
         today = d.getFullYear() + '/' + d.getMonth()  + '/' + d.getDate()
     }
 
+    var today = "2023/03/26"
     var today_readings = []
     var today_datetime = []
 
-    for (let i = 0; i < cbg_datetime.length; i++) {
-        if(cbg_datetime[i].slice(0, 10) == today) {
-            today_readings.push(readings[i])
-            today_datetime.push(cbg_datetime[i])
+    for (let i = 0; i < results.length; i++) {
+        if(results[i]['Before_CBG_Uploaded_At'].slice(0, 10) == today) {
+            today_readings.push(results[i]['Before_CBG_Reading'])
+            today_readings.push(results[i]['After_CBG_Reading'])
+            today_datetime.push(results[i]['Before_CBG_Uploaded_At'])
+            today_datetime.push(results[i]['After_CBG_Uploaded_At'])
         }
     }
-
     var weekly_dates = []
 
     for (let i = 0; i < 7; i++ ) {
@@ -120,14 +131,19 @@
         }
     }
 
+    weekly_records = []
     weekly_readings = []
     weekly_datetime = []
+    weekly_records
 
     for (eachdate of weekly_dates) {
-        for (let i = 0; i < cbg_datetime.length; i++) {
-            if(cbg_datetime[i].slice(0, 10) == eachdate) {
-                weekly_readings.push(readings[i])
-                weekly_datetime.push(cbg_datetime[i])
+        for (let i = 0; i < results.length; i++) {
+            if(results[i]['Before_CBG_Uploaded_At'].slice(0, 10) == eachdate) {
+                weekly_records.push(results[i])
+                weekly_readings.push(results[i]['Before_CBG_Reading'])
+                weekly_readings.push(results[i]['After_CBG_Reading'])
+                weekly_datetime.push(results[i]['Before_CBG_Uploaded_At'])
+                weekly_datetime.push(results[i]['After_CBG_Uploaded_At'])
             }
         }
     }
@@ -141,15 +157,16 @@
             halfweekly_dates.push(d.getFullYear() + '/0' + parseInt(d.getMonth() + 1) + '/' + parseInt(d.getDate() - i))
         }
     }
-
     halfweekly_readings = []
     halfweekly_datetime = []
 
     for (eachdate of halfweekly_dates) {
-        for (let i = 0; i < cbg_datetime.length; i++) {
-            if(cbg_datetime[i].slice(0, 10) == eachdate) {
-                halfweekly_readings.push(readings[i])
-                halfweekly_datetime.push(cbg_datetime[i])
+        for (let i = 0; i < results.length; i++) {
+            if(results[i]['Before_CBG_Uploaded_At'].slice(0, 10) == eachdate) {
+                halfweekly_readings.push(results[i]['Before_CBG_Reading'])
+                halfweekly_readings.push(results[i]['After_CBG_Reading'])
+                halfweekly_datetime.push(results[i]['Before_CBG_Uploaded_At'])
+                halfweekly_datetime.push(results[i]['After_CBG_Uploaded_At'])
             }
         }
     }
@@ -184,7 +201,6 @@
     {
         name: "Past Week",
         handler(chart) {
-            console.log(chart.data)
             chart.data.labels = weekly_datetime;
             const newDataset = {
                 data: weekly_readings,
@@ -235,7 +251,7 @@
                 y: {
                     title: {
                     display: true,
-                    text: measurements[0]
+                    text: results[0]['Before_CBG_Measurement']
                     }
                 }
             },
@@ -250,65 +266,44 @@
     const ctx = document.getElementById("myChart")
     let myChart = new Chart(ctx, config)
 
-    const labels = today_datetime
-    const data2 = {
-        labels: labels,
-        datasets: [{
-            label: 'Glucose Reading',
-            data: today_readings,
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(255, 159, 64, 0.2)',
-                'rgba(255, 205, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(201, 203, 207, 0.2)'
-            ],
-            borderColor: [
-                'rgb(255, 99, 132)',
-                'rgb(255, 159, 64)',
-                'rgb(255, 205, 86)',
-                'rgb(75, 192, 192)',
-                'rgb(54, 162, 235)',
-                'rgb(153, 102, 255)',
-                'rgb(201, 203, 207)'
-            ],
-            borderWidth: 1
-        }],
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: false
-                }
+    // Start of Food Intake Macros
+    food_items = []
+
+    for(each_food of food) {
+        let total_calorie = 0
+        let total_carb = 0
+        let total_sugar = 0
+        let total_fibre = 0
+        let count = 0
+
+        for(each_entry of weekly_records) {
+            if(each_entry['Food_Name'] == each_food['Food_Name']) {
+                total_calorie += each_food['Food_Calorie']
+                total_carb += each_food['Food_Carb']
+                total_sugar += each_food['Food_Sugar']
+                total_fibre += each_food['Food_Fibre']
+                count += 1
             }
         }
-    };
-    
-    new Chart("myChart2", {
-        type: 'bar',
-        data: data2,
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                beginAtZero: true
-                }
-            },
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                },
-                title: {
-                    display: true,
-                    text: 'Glucose Reading Chart'
-                },
+        if(count >= 1) {
+            item = {
+                'food_name': each_food['Food_Name'],
+                'total_calorie': total_calorie,
+                'total_carb': total_carb,
+                'total_sugar': total_sugar,
+                'total_fibre': total_fibre,
+                'count': count
+            }
+            food_items.push(item)
         }
-        },
-    });
+    }
 
-    var xValues3 = ["Italy", "France", "Spain", "USA", "Argentina"];
-    var yValues3 = [55, 49, 44, 24, 15];
+    food_names = []
+    total_calorie = []
+    total_carb = []
+    total_sugar = []
+    total_fibre = []
+
     var barColors = [
         "#b91d47",
         "#00aba9",
@@ -316,23 +311,171 @@
         "#e8c3b9",
         "#1e7145"
     ];
-    new Chart("myChart3", {
-        type: "pie",
-        data: {
-            labels: xValues3,
-            datasets: [{
-            backgroundColor: barColors,
-            data: yValues3
+
+    for (each_entry of food_items) {
+        food_names.push(each_entry['food_name'])
+        total_calorie.push(each_entry['total_calorie'])
+        total_carb.push(each_entry['total_carb'])
+        total_sugar.push(each_entry['total_sugar'])
+        total_fibre.push(each_entry['total_fibre'])
+    }
+
+    const actions2 = [
+    {
+        name: "Calories",
+        handler(chart) {
+            chart.data.labels = food_names;
+            const newDataset = {
+                data: total_calorie,
+                backgroundColor: barColors
+            };
+            chart.options.plugins.title.text = "Weekly Calorie Chart"
+            chart.data.datasets.pop()
+            chart.data.datasets.push(newDataset)
+            chart.update();
+        }
+    },
+    {
+        name: "Carbs",
+        handler(chart) {
+            chart.data.labels = food_names;
+            const newDataset = {
+                data: total_carb,
+                backgroundColor: barColors
+            };
+            chart.options.plugins.title.text = "Weekly Carbs Chart"
+            chart.data.datasets.pop()
+            chart.data.datasets.push(newDataset)
+            chart.update();
+        }
+    },
+    {
+        name: "Sugar",
+        handler(chart) {
+            chart.data.labels = food_names;
+            const newDataset = {
+                data: total_sugar,
+                backgroundColor: barColors
+            };
+            chart.options.plugins.title.text = "Weekly Sugar Chart"
+            chart.data.datasets.pop()
+            chart.data.datasets.push(newDataset)
+            chart.update();
+        }
+    },
+    {
+        name: "Fibre",
+        handler(chart) {
+            chart.data.labels = food_names;
+            const newDataset = {
+                data: total_fibre,
+                backgroundColor: barColors
+            };
+            chart.options.plugins.title.text = "Weekly Fibre Chart"
+            chart.data.datasets.pop()
+            chart.data.datasets.push(newDataset)
+            chart.update();
+        }
+    }];
+
+    actions2.forEach((a, i) => {
+        let button = document.createElement("button");
+        button.id = "button"+i;
+        button.innerText = a.name;
+        button.classList.add('btn')
+        button.classList.add('btn-outline-success')
+        button.classList.add('mr-2')
+        button.onclick = () => a.handler(myChart2);
+        document.querySelector(".buttons2").appendChild(button);
+    });
+
+    var xValues2 = food_names;
+    var yValues2 = total_calorie;
+
+    const data2 = {
+        labels: xValues2,
+        datasets: [{
+                backgroundColor: barColors,
+                data: yValues2
             }]
-        },
+    };
+
+    let config2 = {
+        type: "pie",
+        data: data2,
+        plugins: [ChartDataLabels],
         options: {
             responsive: true,
-            title: {
-            display: true,
-            text: "World Wide Wine Production"
+            plugins: {
+                title: {
+                    display: true,
+                    text: "Weekly Calorie Chart"
+                },
+                legend: {
+                    position: 'bottom'
+                },
+                datalabels: {
+                    color: "#ffffff"
+                }
             }
         }
+    }
+
+    const ctx2 = document.getElementById("myChart2")
+    let myChart2 = new Chart(ctx2, config2)
+
+    log_dict = {}
+
+    for(let i=0; i < results.length; i++) {
+        before_CBG = results[i]['Before_CBG_Reading'] 
+        after_CBG = results[i]['After_CBG_Reading']
+        difference = after_CBG - before_CBG
+
+        food_name = results[i]['Food_Name']
+
+        if(log_dict[food_name]) {
+            log_dict[food_name].push(parseFloat(difference.toFixed(1)))
+        } else {
+            log_dict[food_name] = [parseFloat(difference.toFixed(1))]
+        }
+    }
+
+    function getAverage(array) {
+        const total = array.reduce((acc, c) => acc + c, 0);
+        return total / array.length;
+    }
+
+    logbook = {}
+    for (var key in log_dict) {
+        average = getAverage(log_dict[key])
+        logbook[key] = average.toFixed(2)
+    }
+
+    var items = Object.keys(logbook).map(function(key) {
+        return [key, logbook[key]];
     });
+    items.sort(function(first, second) {
+        return second[1] - first[1];
+    });
+
+    console.log(items)
+
+    for(var each_item in items) {
+        var table = document.getElementById('logbook')
+        var row = table.insertRow(-1)
+
+        var cell1 = row.insertCell(0)
+        var cell2 = row.insertCell(-1)
+
+        console.log()
+        if (parseFloat(items[each_item][1]) >= 0) {
+            cell1.innerHTML =items[each_item][0]
+            cell2.innerHTML = '+ ' + items[each_item][1] + ' ' + measurement_unit
+        } else {
+            cell1.innerHTML = items[each_item][0]
+            cell2.innerHTML = items[each_item][1]
+        }
+    }
 </script>
 
 {% endblock %}
