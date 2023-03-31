@@ -251,7 +251,7 @@
         </form>
     </div>
     <!-- End Upload Area -->
-
+    <img id="imagePreview" style="height: 1px;" />
     <!-- Start of Tele Button Test -->
     <div>
         <input id="CHAT_ID" value="{{ CHAT_ID }}" type="hidden" />
@@ -359,9 +359,10 @@
     fileInput.addEventListener('change', function (event) {
         // Select The Chosen File
         const file = event.target.files[0];
-        console.log(event.target)
+        //console.log(event.target.files[0])
         // Call Function uploadFile(), And Send To Her The Chosen File :)
-        uploadFile(file);
+        //uploadFile(file);
+        readURL2(event.target.files[0])
     })
     fileInput2.addEventListener('change', function (event) {
         const file = event.target.files[0];
@@ -409,13 +410,13 @@
     })
 
     const URL = 'https://teachablemachine.withgoogle.com/models/TqnQPSTyE/';
-
     let model, labelContainer, maxPredictions;
+
 
     // Load the image model 
     async function init() {
-        const modelURL = URL + 'model.json';
-        const metadataURL = URL + 'metadata.json';
+        var modelURL = URL + 'model.json';
+        var metadataURL = URL + 'metadata.json';
 
         // load the model and metadata
         model = await tmImage.load(modelURL, metadataURL);
@@ -427,29 +428,14 @@
             labelContainer.appendChild(document.createElement('div'));
         }
     }
-    const URL2 = 'https://teachablemachine.withgoogle.com/models/tPCPE7VXk/';
-
-    async function init2() {
-            const modelURL = URL2 + 'model.json';
-            const metadataURL = URL2 + 'metadata.json';
-
-            // load the model and metadata
-            model = await tmImage.load(modelURL, metadataURL);
-            maxPredictions = model.getTotalClasses();
-
-            labelContainer = document.getElementById('label-container');
-            for (let i = 0; i < maxPredictions; i++) {
-                // and class labels
-                labelContainer.appendChild(document.createElement('div'));
-            }
-        }
+  
 
     async function predict() {
 				// predict can take in an image, video or canvas html element
 				var finalClass = "";
 				var finalPrediction = 0;
 				var image = document.getElementById('previewImage2');
-				const prediction = await model.predict(image, false);
+				var prediction = await model.predict(image, false);
 				for (let i = 0; i < maxPredictions; i++) {
 					//const classPrediction =
 					//	prediction[i].className + ': ' + prediction[i].probability.toFixed(2);
@@ -504,28 +490,12 @@
             }
         }
 
-        function readURL2(input) {
-            console.log(typeof(input))
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    console.log(typeof(input)+"lol")
-                };
-                reader.readAsDataURL(input.files[0]);
-                init2().then(() => {
-                    console.log('predict here')
-                    predict2()
-                });
-            }
-        }
+   
 
         $('#fileInput2').change(function () {
             readURL(this);
         });
-        $('#fileInput').change(function () {
-            readURL2(this);
-            console.log(this)
-        });
+    
 
         function checkStatsForToday(input){
             beforeLimit = 7;
@@ -566,36 +536,12 @@
                 console.log(error);
             });
         }
-        async function predict2() {
-				// predict can take in an image, video or canvas html element
-				var finalClass = "";
-				var finalPrediction = 0;
-				var image = document.getElementById('previewImage');
-				const prediction = await model.predict(image, false);
-				for (let i = 0; i < maxPredictions; i++) {
-					//const classPrediction =
-					//	prediction[i].className + ': ' + prediction[i].probability.toFixed(2);
-					//labelContainer.childNodes[i].innerHTML = classPrediction;
-					if (prediction[i].probability.toFixed(2)>finalPrediction){
-						finalPrediction=prediction[i].probability;
-						finalClass = prediction[i].className;
-					}
-				}
-				//console.log(finalClass)
-				//console.log(finalPrediction)}
-                if(finalClass=="CBG"){
-                    console.log('noice')
-                }else{
-                    alert("Please upload a CBG image and not a food image")
-                }
-            }
+        
 
-        async function helper(){
-            console.log(done);
-        }
+
         // Upload File Function
         function uploadFile(file) {
-            
+            console.log(file)
             let that = this;
             let formData = new FormData()
             formData.append('image', file)
@@ -861,6 +807,70 @@
     //https://www.diabetes.co.uk/diabetes_care/blood-sugar-level-ranges.html
 
 </script>
+<script>
+    const URL2 = 'https://teachablemachine.withgoogle.com/models/tPCPE7VXk/';
+    
+    let model2, labelContainer2, maxPredictions2;
+    
+    // Load the image model 
+    async function init2() {
+        const modelURL2 = URL2 + 'model.json';
+        const metadataURL2 = URL2 + 'metadata.json';
+    
+        // load the model and metadata
+        model2 = await tmImage.load(modelURL2, metadataURL2);
+        maxPredictions = model2.getTotalClasses();
+    
+        labelContainer = document.getElementById('label-container');
+        for (let i = 0; i < maxPredictions2; i++) {
+            // and class labels
+            labelContainer.appendChild(document.createElement('div'));
+        }
+
+    }
+    
+    async function predict2(event) {
+        // predict can take in an image, video or canvas html element
+        var image = document.getElementById('imagePreview');
+        const prediction2 = await model2.predict(image, false);
+        console.log(image)
+        for (let i = 0; i < maxPredictions2; i++) {
+            const classPrediction2 =
+                prediction2[i].className + ': ' + prediction2[i].probability.toFixed(2);
+            labelContainer.childNodes[i].innerHTML = classPrediction2;
+        }
+        console.log(prediction2[0])
+        console.log(prediction2[1])
+        if (prediction2[0].probability>prediction2[1].probability){
+            console.log(prediction2[0])
+            console.log("please upload food image")
+        }else{
+            console.log(prediction2[1])
+            console.log("ello")
+            uploadFile(event.target.files[0])
+        }
+        
+        //console.log(event.target.files[0])
+    }
+        function readURL2(input,event) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#imagePreview').attr('src', e.target.result);
+                    // $('#imagePreview').css('background-image', 'url(' + e.target.result + ')');
+                    $('#imagePreview').hide();
+                    $('#imagePreview').fadeIn(650);
+                };
+                reader.readAsDataURL(input.files[0]);
+                init2().then(() => {
+                    predict2(event);
+                });
+            }
+        }
+        $('#fileInput').change(function (event) {
+            readURL2(this,event);
+        });
+    </script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
 
