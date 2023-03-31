@@ -359,6 +359,7 @@
     fileInput.addEventListener('change', function (event) {
         // Select The Chosen File
         const file = event.target.files[0];
+        console.log(event.target)
         // Call Function uploadFile(), And Send To Her The Chosen File :)
         uploadFile(file);
     })
@@ -426,6 +427,22 @@
             labelContainer.appendChild(document.createElement('div'));
         }
     }
+    const URL2 = 'https://teachablemachine.withgoogle.com/models/tPCPE7VXk/';
+
+    async function init2() {
+            const modelURL = URL2 + 'model.json';
+            const metadataURL = URL2 + 'metadata.json';
+
+            // load the model and metadata
+            model = await tmImage.load(modelURL, metadataURL);
+            maxPredictions = model.getTotalClasses();
+
+            labelContainer = document.getElementById('label-container');
+            for (let i = 0; i < maxPredictions; i++) {
+                // and class labels
+                labelContainer.appendChild(document.createElement('div'));
+            }
+        }
 
     async function predict() {
 				// predict can take in an image, video or canvas html element
@@ -471,6 +488,7 @@
 
 			}
         function readURL(input) {
+            console.log(typeof(input))
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
                 reader.onload = function (e) {
@@ -485,8 +503,28 @@
                 });
             }
         }
+
+        function readURL2(input) {
+            console.log(typeof(input))
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    console.log(typeof(input)+"lol")
+                };
+                reader.readAsDataURL(input.files[0]);
+                init2().then(() => {
+                    console.log('predict here')
+                    predict2()
+                });
+            }
+        }
+
         $('#fileInput2').change(function () {
             readURL(this);
+        });
+        $('#fileInput').change(function () {
+            readURL2(this);
+            console.log(this)
         });
 
         function checkStatsForToday(input){
@@ -528,11 +566,36 @@
                 console.log(error);
             });
         }
+        async function predict2() {
+				// predict can take in an image, video or canvas html element
+				var finalClass = "";
+				var finalPrediction = 0;
+				var image = document.getElementById('previewImage');
+				const prediction = await model.predict(image, false);
+				for (let i = 0; i < maxPredictions; i++) {
+					//const classPrediction =
+					//	prediction[i].className + ': ' + prediction[i].probability.toFixed(2);
+					//labelContainer.childNodes[i].innerHTML = classPrediction;
+					if (prediction[i].probability.toFixed(2)>finalPrediction){
+						finalPrediction=prediction[i].probability;
+						finalClass = prediction[i].className;
+					}
+				}
+				//console.log(finalClass)
+				//console.log(finalPrediction)}
+                if(finalClass=="CBG"){
+                    console.log('noice')
+                }else{
+                    alert("Please upload a CBG image and not a food image")
+                }
+            }
 
-
-
+        async function helper(){
+            console.log(done);
+        }
         // Upload File Function
         function uploadFile(file) {
+            
             let that = this;
             let formData = new FormData()
             formData.append('image', file)
