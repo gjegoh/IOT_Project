@@ -36,7 +36,7 @@
     <div class="dashboard_area">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-6 mx-auto solid_line">
+                <div class="col-md-6 mx-auto solid_line">
                     <h3><b>Diabreezy Summary</b></h3>
                     <div class="summary">
                         <p id="latestreading"><b>Latest Reading: </b></p>
@@ -44,7 +44,7 @@
                         <p id="latestuploaddate"><b>Last Uploaded At: </b></p>
                     </div>
                 </div>
-                <div class="col-6 mx-auto">
+                <div class="col-md-6 mx-auto">
                     <h3><b>Glucose Reading Chart</b></h3>
                     <canvas id="myChart" class="chart_area"></canvas>
                     <section class="buttons"></section>
@@ -54,13 +54,16 @@
     </div>
     <div class="dashboard_area">
         <div class="row">
-            <div class="col-6 mx-auto solid_line">
+            <div class="col-md-6 mx-auto solid_line">
                 <h3><b>Weekly Food Nutrients Intake</b></h3>
                 <canvas id="myChart2" class="piechart"></canvas>
                 <section class="buttons2"></section>
             </div>
-            <div class="col-6 mx-auto">
+            <div class="col-md-6 mx-auto">
                 <h3><b>Diabreezy Logbook</b></h3>
+                <div class="m-3 w-50 mx-auto">
+                    <input type="text" class="form-control" id="search" placeholder="Search food name..." onkeyup="filteredList()">
+                </div>
                 <table class="table table-hover logbook" id="logbook">
                     <thead>
                         <tr>
@@ -109,7 +112,6 @@
         today = d.getFullYear() + '/' + d.getMonth()  + '/' + d.getDate()
     }
 
-    var today = "2023/03/26"
     var today_readings = []
     var today_datetime = []
 
@@ -124,7 +126,9 @@
     var weekly_dates = []
 
     for (let i = 0; i < 7; i++ ) {
-        if (parseInt(d.getDate() - i) < 10) { 
+        if (parseInt(d.getDate() - i) <= 0) {
+            weekly_dates.push(d.getFullYear() + '/0' + parseInt(d.getMonth()) + '/' + parseInt(31 - i))
+        } else if (parseInt(d.getDate() - i) < 10) { 
             weekly_dates.push(d.getFullYear() + '/0' + parseInt(d.getMonth() + 1) + '/0' + parseInt(d.getDate() - i))
         } else {
             weekly_dates.push(d.getFullYear() + '/0' + parseInt(d.getMonth() + 1) + '/' + parseInt(d.getDate() - i))
@@ -134,7 +138,7 @@
     weekly_records = []
     weekly_readings = []
     weekly_datetime = []
-    weekly_records
+    food_item = []
 
     for (eachdate of weekly_dates) {
         for (let i = 0; i < results.length; i++) {
@@ -144,6 +148,8 @@
                 weekly_readings.push(results[i]['After_CBG_Reading'])
                 weekly_datetime.push(results[i]['Before_CBG_Uploaded_At'])
                 weekly_datetime.push(results[i]['After_CBG_Uploaded_At'])
+                food_item.push(results[i]['Food_Name'])
+                food_item.push(results[i]['Food_Name'])
             }
         }
     }
@@ -151,7 +157,9 @@
     var halfweekly_dates = []
 
     for (let i = 0; i < 3; i++ ) {
-        if (parseInt(d.getDate() - i) < 10) { 
+        if (parseInt(d.getDate() - i) <= 0) {
+            halfweekly_dates.push(d.getFullYear() + '/0' + parseInt(d.getMonth()) + '/' + parseInt(31 - i))
+        } else if (parseInt(d.getDate() - i) < 10) { 
             halfweekly_dates.push(d.getFullYear() + '/0' + parseInt(d.getMonth() + 1) + '/0' + parseInt(d.getDate() - i))
         } else {
             halfweekly_dates.push(d.getFullYear() + '/0' + parseInt(d.getMonth() + 1) + '/' + parseInt(d.getDate() - i))
@@ -171,42 +179,90 @@
         }
     }
 
+    threshold_halfweekly = []
+    for(let i = 0; i < halfweekly_readings.length; i++) {
+        threshold_halfweekly.push('8.5')
+    }
+
+    threshold_daily = []
+    for(let i = 0; i < today_readings.length; i++) {
+        threshold_daily.push('8.5')
+    }
+
+    threshold_weekly = []
+    for(let i = 0; i < weekly_readings.length; i++) {
+        threshold_weekly.push('8.5')
+    }
+
     const actions = [
     {
         name: "Today",
         handler(chart) {
             chart.data.labels = today_datetime;
+            const threshold = {
+                label: 'Threshold',
+                data: threshold_daily,
+                borderColor: "rgb(255, 0, 0)",
+                backgroundColor: "rgb(255, 0, 0)",
+                pointRadius: 0
+            }
             const newDataset = {
+                label: 'Glucose Reading',
                 data: today_readings,
-                borderColor: "rgb(75, 192, 192)"
+                borderColor: "rgb(75, 192, 192)",
+                backgroundColor: "rgb(75, 192, 192)"
             };
             chart.data.datasets.pop()
+            chart.data.datasets.pop()
+            chart.data.datasets.push(threshold)
             chart.data.datasets.push(newDataset)
             chart.update();
         }
     },
     {
-        name: "Past 3 Days",
+        name: "Past 4 Days",
         handler(chart) {
             chart.data.labels = halfweekly_datetime;
+            const threshold = {
+                label: 'Threshold',
+                data: threshold_halfweekly,
+                borderColor: "rgb(255, 0, 0)",
+                backgroundColor: "rgb(255, 0, 0)",
+                pointRadius: 0
+            }
             const newDataset = {
+                label: 'Glucose Reading',
                 data: halfweekly_readings,
-                borderColor: "rgb(75, 192, 192)"
+                borderColor: "rgb(75, 192, 192)",
+                backgroundColor: "rgb(75, 192, 192)"
             };
             chart.data.datasets.pop()
+            chart.data.datasets.pop()
+            chart.data.datasets.push(threshold)
             chart.data.datasets.push(newDataset)
             chart.update();
         }
     },
     {
-        name: "Past Week",
+        name: "Past 7 Days",
         handler(chart) {
             chart.data.labels = weekly_datetime;
+            const threshold = {
+                label: 'Threshold',
+                data: threshold_weekly,
+                borderColor: "rgb(255, 0, 0)",
+                backgroundColor: "rgb(255, 0, 0)",
+                pointRadius: 0
+            }
             const newDataset = {
+                label: 'Glucose Reading',
                 data: weekly_readings,
-                borderColor: "rgb(75, 192, 192)"
+                borderColor: "rgb(75, 192, 192)",
+                backgroundColor: "rgb(75, 192, 192)"
             };
             chart.data.datasets.pop()
+            chart.data.datasets.pop()
+            chart.data.datasets.push(threshold)
             chart.data.datasets.push(newDataset)
             chart.update();
         }
@@ -222,23 +278,32 @@
         button.onclick = () => a.handler(myChart);
         document.querySelector(".buttons").appendChild(button);
     });
-    
+
     const data = {
         labels: halfweekly_datetime,
         datasets: [
+            {
+                label: 'Threshold',
+                data: threshold_halfweekly,
+                fill: false,
+                pointRadius: 0,
+                borderColor: "rgb(255, 0, 0)",
+                backgroundColor: "rgb(255, 0, 0)"
+            },
             {
                 label: 'Glucose Reading',
                 data: halfweekly_readings,
                 fill: false,
                 lineTension: 0.1,
-                borderColor: "rgb(75, 192, 192)"
+                borderColor: "rgb(75, 192, 192)",
+                backgroundColor: "rgb(75, 192, 192)"
             },
-        ]
+        ],
+        datasets2: food_item
     };
-
     let config = {
         type: "line",
-        data,
+        data: data,
         options: {
             responsive: true,
             scales: {
@@ -259,6 +324,24 @@
                 legend: {
                     position: 'bottom',
                 },
+                tooltip: {
+                    callbacks: {
+                        beforeLabel: function(tooltipItem) {
+                            if(parseInt(tooltipItem.dataIndex) % 2 == 0) {
+                                return 'Before Food Reading'
+                            } else {
+                                return 'After Food Reading'
+                            }
+                        },
+                        label: function(tooltipItem, data) {
+                            return tooltipItem.formattedValue + ' ' + measurement_unit
+                        },
+                        afterLabel: function(tooltipItem, data) {
+                            return 'Food Consumed: ' + food_item[tooltipItem.dataIndex]
+                        }
+                    },
+                    bodySpacing: 7
+                }
             }
         }
     }
@@ -469,11 +552,31 @@
 
         console.log()
         if (parseFloat(items[each_item][1]) >= 0) {
-            cell1.innerHTML =items[each_item][0]
+            cell1.innerHTML = items[each_item][0]
             cell2.innerHTML = '+ ' + items[each_item][1] + ' ' + measurement_unit
         } else {
             cell1.innerHTML = items[each_item][0]
             cell2.innerHTML = items[each_item][1]
+        }
+    }
+
+    function filteredList() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById('search');
+        filter = input.value.toLowerCase();
+        table = document.getElementById('logbook');
+        tr = table.getElementsByTagName("tr");
+
+        for(i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[0];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
         }
     }
 </script>
