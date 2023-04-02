@@ -99,8 +99,11 @@
     var measurement_unit = results[results.length - 1]['After_CBG_Measurement']
     var last_fooditem = results[results.length - 1]['Food_Name']
 
-    document.getElementById("latestreading").innerHTML += latest_reading + ' '
-    document.getElementById("latestreading").innerHTML += measurement_unit
+    if(measurement_unit != 'mmolL') {
+        latest_reading = latest_reading * mgTommol
+    }
+
+    document.getElementById("latestreading").innerHTML += latest_reading.toFixed(1) + ' mmol/L'
     document.getElementById("lastfooditem").innerHTML += last_fooditem
     document.getElementById("latestuploaddate").innerHTML += latest_datetime
 
@@ -355,7 +358,7 @@
                 y: {
                     title: {
                     display: true,
-                    text: results[0]['Before_CBG_Measurement']
+                    text: 'mmol/L'
                     }
                 }
             },
@@ -373,7 +376,7 @@
                             }
                         },
                         label: function(tooltipItem, data) {
-                            return tooltipItem.formattedValue + ' ' + measurement_unit
+                            return tooltipItem.formattedValue + ' ' + 'mmol/L'
                         },
                         afterLabel: function(tooltipItem, data) {
                             return 'Food Consumed: ' + food_item[tooltipItem.dataIndex]
@@ -558,7 +561,7 @@
         if(results[i]['After_CBG_Measurement'] != 'mmolL') {
             after_CBG = after_CBG * mgTommol
         }
-        
+
         difference = after_CBG - before_CBG
 
         food_name = results[i]['Food_Name']
@@ -600,7 +603,7 @@
         console.log()
         if (parseFloat(items[each_item][1]) >= 0) {
             cell1.innerHTML = items[each_item][0]
-            cell2.innerHTML = '+ ' + items[each_item][1] + ' ' + measurement_unit
+            cell2.innerHTML = '+ ' + items[each_item][1] + ' ' + 'mmol/L'
         } else {
             cell1.innerHTML = items[each_item][0]
             cell2.innerHTML = items[each_item][1]
