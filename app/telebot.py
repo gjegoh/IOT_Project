@@ -8,9 +8,10 @@ from datetime import datetime as dt
 from telegram.ext import Updater
 from telegram import ParseMode
 from CBG.models import CBG_Food_Record
+from random import randrange
 
 def daily_reminder(context):
-    context.bot.send_message(chat_id=os.environ.get("CHAT_ID"), text=f'<b>This</b> is your daily reminder to submit your CBG reading if you have not!' , parse_mode=ParseMode.HTML)
+    context.bot.send_message(chat_id=os.environ.get("CHAT_ID"), text=f'This is your daily reminder to <b>submit your CBG reading</b> if you have not!' , parse_mode=ParseMode.HTML)
 
 def daily_report(context):
     data = context.job.context
@@ -21,12 +22,14 @@ def daily_report(context):
     totalSugar = data['TotalSugar']
     totalFibre = data['TotalFibre']
     allInsight = "\n\n".join(data['Insight'])
+    tip = data['Tip']
 
     theText = (
-        f'<b>Daily Report ({today}) \n Food that you ate today:</b> \n {allFood} \n\n <b>Here are the macros:</b>' 
-        f'\n Total Calories: <b>{totalCalories}g</b> \n Total Carbs: <b>{totalCarbs}g</b> \n Total Sugar: <b>{totalSugar}g</b> \n Total Fibre: <b>{totalFibre}g</b>'
-        f'\n\n <b>Insights:</b> \n {allInsight}'
-        f'\n\n <b>Note:</b> We reference the Type 2 diabetes threshold levels. Over limit(>=8.5mmol/L). Approaching threshold(>=7.5mmol/L). Please drop @ahloysius a telegram message to customise your threshold values'
+        f'<b>Daily Report ({today})\nFood that you ate today:</b> \n {allFood} \n\n <b>Nutrients values:</b>' 
+        f'\nTotal Calories: <b>{totalCalories}kcal</b> \nTotal Carbs: <b>{totalCarbs}g</b> \nTotal Sugar: <b>{totalSugar}g</b> \nTotal Fibre: <b>{totalFibre}g</b>'
+        f'\n\n<b>Insights:</b> \n{allInsight}'
+        f'\n\nTip of the day: {tip}'
+        f'\n\n<b>Note:</b> We reference the Type 2 diabetes threshold levels. Over limit(>=8.5mmol/L). Approaching threshold(>=7.5mmol/L). Please drop @ahloysius a telegram message to customise your threshold values'
     )
 
     context.bot.send_message(chat_id=os.environ.get("CHAT_ID"), text=theText , parse_mode=ParseMode.HTML)
@@ -38,15 +41,21 @@ def main():
     mgTommol = 0.0555
     limit = 8.5 #mmol/L
     query_set = CBG_Food_Record.objects.all().order_by('Before_CBG_Uploaded_At__minute')
+    tipBank = ["<b>Choose healthier carbohydrates!</b>It’s important to cut down on foods low in fibre such as white bread, white rice and highly-processed cereals. Choose healthier food like unsweetened milk, brown rice, or pulses like chickpeas",
+                "<b>Cut down on added sugar!</b>We know cutting out sugar can be really hard at the beginning, so small practical swaps are a good starting point when you’re trying to cut down on excess sugar. Swapping sugary drinks, energy drinks and fruit juices with water, plain milk, or tea and coffee without sugar can be a good start",
+                "<b>Don’t bother with so-called diabetic food! There isn’t any evidence that these foods offer you a special benefit over eating healthily. They can also often contain just as much fat and calories as similar products, and can still affect your blood glucose level. These foods can also sometimes have a laxative effect.</b>",
+                "<b>Be smart with snacks!</b>If you want a snack, choose yoghurts, unsalted nuts, seeds, fruits and vegetables instead of crisps, chips, biscuits and chocolates. But watch your portions still – it’ll help you keep an eye on your weight",
+                "<b>Eat less salt!Eating lots of salt can increase your risk of high blood pressure, which in turn increases risk of heart diseases and stroke. And when you have diabetes, you’re already more at risk of all of these conditions. Try to limit yourself to a maximum of 6g (one teaspoonful) of salt a day.</b>"]
 
     theDict = {
         'Today': "",
         'FoodList': [],
         'TotalCalories': 0,
-        'TotalCarbs': 0 ,
+        'TotalCarbs': 0,
         'TotalSugar': 0,
         'TotalFibre': 0,
-        'Insight': []
+        'Insight': [],
+        'Tip': ""
     }
 
     for i in query_set:
@@ -73,17 +82,17 @@ def main():
             elif after > (limit - 1):
                 insight += f'Your glucose level <b>reached near the threshold limit</b> after consuming this food item. You might want to monitor the consumption'
             else:
-                insight += f'Your glucose level is within the <b>normal levels</b>! It is likely fine if you continue consuming this food'
+                insight += f'Your glucose level is within <b>normal levels</b>! It is likely fine if you continue consuming this food'
 
             theDict['Insight'].append(insight)
 
-
+    theDict['Tip'] = tipBank[randrange(4)]
     TOKEN = os.environ.get("TELE_TOKEN")
     updater = Updater(TOKEN, use_context=True)
     job = updater.job_queue
 
-    timeToSendReport = datetime.time(7, 3, 0, 000000)
-    timeToSendMsg = datetime.time(3, 19, 15, 000000) #24hr clock, uses UTC timing = SG time -8. For example, 10pm SGT = 2pm UTC = 1400H GMT
+    timeToSendReport = datetime.time(12, 30, 0, 000000)
+    timeToSendMsg = datetime.time(12, 30, 15, 000000) #24hr clock, uses UTC timing = SG time -8. For example, 10pm SGT = 2pm UTC = 1400H GMT
 
     
     #Code to retrieve data for the past 7 days from DB, sum up values, case statement send if healthy, at risk, unhealthy 
@@ -99,8 +108,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-# 1. below / above threshold
-# 2. daily report of readings & macros
-# 3. weekly report of readings & macros
-# 4. take cbg reading reminder

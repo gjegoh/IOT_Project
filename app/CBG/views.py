@@ -44,8 +44,6 @@ def upload_CBG(request):
             cbg_datetime.append(i.After_CBG_Uploaded_At.astimezone(timezone('Asia/Singapore')).strftime("%Y/%m/%d, %H:%M"))
 
     return render(request, 'CBG/upload_CBG.html', context={
-        'TELE_TOKEN': os.environ.get('TELE_TOKEN'),
-        'CHAT_ID': os.environ.get('CHAT_ID'),
         'readings': readings,
         'cbg_datetime': cbg_datetime
     })

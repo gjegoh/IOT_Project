@@ -6,6 +6,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from CBG.models import CBG_Food_Record
 import datetime
 from pytz import timezone
+import os
 
 # # endpoint to render index page for all users
 # def index(request):
@@ -74,7 +75,9 @@ def index(request):
             'Main/index.html',
             context={
                 'food': food,
-                'results': results
+                'results': results,
+                'TELE_TOKEN': os.environ.get('TELE_TOKEN'),
+                'CHAT_ID': os.environ.get('CHAT_ID'),
             }
         )
 

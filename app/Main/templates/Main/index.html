@@ -76,7 +76,8 @@
         </div>
     </div>
     <!-- End of Dashboard -->
-
+    <input id="CHAT_ID" value="{{ CHAT_ID }}" type="hidden" />
+    <input id="TELE_TOKEN" value="{{ TELE_TOKEN }}" type="hidden" />
 </div>
 
 {% else %}
@@ -86,9 +87,12 @@
 {% endif %}
 
 <script>
+    const mgTommol = 0.0555
+    const teleToken = $("#TELE_TOKEN").val();
+    const chatID = $("#CHAT_ID").val();
+    const telegramURL = 'https://api.telegram.org/bot';
     var results = {{results|safe}}
     var food = {{food|safe}}
-    
     // Diabreezy Summary
     var latest_reading = results[results.length - 1]['After_CBG_Reading']
     var latest_datetime = results[results.length - 1]['After_CBG_Uploaded_At']
@@ -124,6 +128,11 @@
             today_datetime.push(results[i]['After_CBG_Uploaded_At'])
         }
     }
+
+    console.log(today_readings)
+    checkStatsForToday(today_readings); 
+    //https://www.diabetes.co.uk/diabetes_care/blood-sugar-level-ranges.html
+
     var weekly_dates = []
 
     for (let i = 0; i < 7; i++ ) {
@@ -579,6 +588,50 @@
                 }
             }
         }
+    }
+
+    function checkStatsForToday(input){
+        beforeLimit = 7;
+        afterLimit = 8.5; //mmol/L
+        for (let i=0; i<input.length-1;i++){
+            let before = input[i];
+            let after = input[i+1];
+
+            //placeholder value 60 to show that mgdL was used and convert all to mmol
+            before = before > 60 ? (before * mgTommol).toFixed(1) : before; 
+            after = after > 60 ? (after * mgTommol).toFixed(1) : after;
+
+            if ((before > beforeLimit) || (after > afterLimit)){
+                exceedThresholdTeleMsg(before, after);
+                break
+            } else if ((before > beforeLimit - 0.5) || (after > afterLimit - 0.5)){
+                approachingThresholdTeleMsg(before, after);
+                break            
+            }
+        }
+    }
+
+    function approachingThresholdTeleMsg(after){
+            let message = "Your glucose level is approaching the threshold limit. You might want to cut down on whatever food you have just eaten. Your current glucose level is at " + after
+            axios.post(telegramURL + teleToken + '/sendMessage?chat_id=' + chatID +'&text='+ message)
+            .then(function (response) {
+                console.log(response);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        }
+
+    function exceedThresholdTeleMsg(before, after){
+        let message = "There a sudden high spike in your glucose level today! Your previous glucose level was " + before + 
+        " and your current level is at " + after + ". You might want to check what you have just eaten"
+        axios.post(telegramURL + teleToken + '/sendMessage?chat_id=' + chatID +'&text='+ message)
+        .then(function (response) {
+            console.log(response);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
     }
 </script>
 

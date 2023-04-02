@@ -252,13 +252,6 @@
     </div>
     <!-- End Upload Area -->
     <img id="imagePreview" style="height: 1px;" />
-    <!-- Start of Tele Button Test -->
-    <div>
-        <input id="CHAT_ID" value="{{ CHAT_ID }}" type="hidden" />
-        <input id="TELE_TOKEN" value="{{ TELE_TOKEN }}" type="hidden" />
-        <button class="btn-primary btn" onclick="exceedThresholdTeleMsg()">Reminder Tele Msg</button>
-    </div>
-    <!-- End of Tele Button Test -->
 {% else %}
 <h1>Index Page</h1>
     <p>You are not logged in</p>
@@ -495,48 +488,6 @@
         $('#fileInput2').change(function () {
             readURL(this);
         });
-    
-
-        function checkStatsForToday(input){
-            beforeLimit = 7;
-            afterLimit = 8.5
-            for (let i=0; i<input.length-1;i++){
-                let before = input[i];
-                let after = input[i+1];
-
-                if ((before > beforeLimit) || (after > afterLimit)){
-                    exceedThresholdTeleMsg(before, after);
-                    break
-                } else if ((before > beforeLimit - 0.5) || (after > afterLimit - 0.5)){
-                    approachingThresholdTeleMsg(before, after);
-                    break            
-                }
-            }
-        }
-
-        function approachingThresholdTeleMsg(after){
-            let message = "Your glucose level is approaching the threshold limit. You might want to cut down on whatever food you have just eaten. Your current glucose level is at " + after
-            axios.post(telegramURL + teleToken + '/sendMessage?chat_id=' + chatID +'&text='+ message)
-            .then(function (response) {
-                console.log(response);
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-        }
-
-        function exceedThresholdTeleMsg(before, after){
-            let message = "There a sudden high spike in your glucose level today! Your previous glucose level was " + before + 
-            " and your current level is at " + after + ". You might want to check what you have just eaten"
-            axios.post(telegramURL + teleToken + '/sendMessage?chat_id=' + chatID +'&text='+ message)
-            .then(function (response) {
-                console.log(response);
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-        }
-        
 
 
         // Upload File Function
@@ -783,28 +734,10 @@
             }
         }
 
-    const teleToken = $("#TELE_TOKEN").val();
-    const chatID = $("#CHAT_ID").val();
-    const telegramURL = 'https://api.telegram.org/bot';
-
     var readings = {{readings|safe}}
     var cbg_datetime = {{cbg_datetime|safe}}
     // console.log(readings)
     // console.log(cbg_datetime)
-
-    logBook = {}
-    temp = []
-    for (let i = 0; i < cbg_datetime.length; i++){
-        dateKey = cbg_datetime[i].split(',')[0]
-        if (logBook[dateKey] == undefined){
-            logBook[dateKey] = []
-        }
-        logBook[dateKey].push(readings[i])
-    }
-
-    console.log(logBook[Object.keys(logBook)[Object.keys(logBook).length - 1]])
-    checkStatsForToday(logBook[Object.keys(logBook)[Object.keys(logBook).length - 1]]); //Gets last record, supposingly today
-    //https://www.diabetes.co.uk/diabetes_care/blood-sugar-level-ranges.html
 
 </script>
 <script>
