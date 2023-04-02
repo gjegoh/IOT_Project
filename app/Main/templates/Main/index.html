@@ -112,6 +112,7 @@
         today = d.getFullYear() + '/' + d.getMonth()  + '/' + d.getDate()
     }
 
+    var today = '2023/04/03'
     var today_readings = []
     var today_datetime = []
 
@@ -181,17 +182,17 @@
 
     threshold_halfweekly = []
     for(let i = 0; i < halfweekly_readings.length; i++) {
-        threshold_halfweekly.push('8.5')
+        threshold_halfweekly.push('7.5')
     }
 
     threshold_daily = []
     for(let i = 0; i < today_readings.length; i++) {
-        threshold_daily.push('8.5')
+        threshold_daily.push('7.5')
     }
 
     threshold_weekly = []
     for(let i = 0; i < weekly_readings.length; i++) {
-        threshold_weekly.push('8.5')
+        threshold_weekly.push('7.5')
     }
 
     const actions = [
@@ -412,7 +413,7 @@
                 data: total_calorie,
                 backgroundColor: barColors
             };
-            chart.options.plugins.title.text = "Weekly Calorie Chart"
+            chart.options.plugins.title.text = "Weekly Calorie Chart (kCal)"
             chart.data.datasets.pop()
             chart.data.datasets.push(newDataset)
             chart.update();
@@ -426,7 +427,7 @@
                 data: total_carb,
                 backgroundColor: barColors
             };
-            chart.options.plugins.title.text = "Weekly Carbs Chart"
+            chart.options.plugins.title.text = "Weekly Carbs Chart (g)"
             chart.data.datasets.pop()
             chart.data.datasets.push(newDataset)
             chart.update();
@@ -440,7 +441,7 @@
                 data: total_sugar,
                 backgroundColor: barColors
             };
-            chart.options.plugins.title.text = "Weekly Sugar Chart"
+            chart.options.plugins.title.text = "Weekly Sugar Chart (g)"
             chart.data.datasets.pop()
             chart.data.datasets.push(newDataset)
             chart.update();
@@ -454,7 +455,7 @@
                 data: total_fibre,
                 backgroundColor: barColors
             };
-            chart.options.plugins.title.text = "Weekly Fibre Chart"
+            chart.options.plugins.title.text = "Weekly Fibre Chart (g)"
             chart.data.datasets.pop()
             chart.data.datasets.push(newDataset)
             chart.update();
@@ -492,7 +493,7 @@
             plugins: {
                 title: {
                     display: true,
-                    text: "Weekly Calorie Chart"
+                    text: "Weekly Calorie Chart (kCal)"
                 },
                 legend: {
                     position: 'bottom'
