@@ -91,8 +91,8 @@ def main():
     updater = Updater(TOKEN, use_context=True)
     job = updater.job_queue
 
-    timeToSendReport = datetime.time(12, 30, 0, 000000)
-    timeToSendMsg = datetime.time(12, 30, 15, 000000) #24hr clock, uses UTC timing = SG time -8. For example, 10pm SGT = 2pm UTC = 1400H GMT
+    timeToSendReport = datetime.time(5, 0, 0, 000000)
+    timeToSendMsg = datetime.time(5, 0, 15, 000000) #24hr clock, uses UTC timing = SG time -8. For example, 10pm SGT = 2pm UTC = 1400H GMT
 
     
     #Code to retrieve data for the past 7 days from DB, sum up values, case statement send if healthy, at risk, unhealthy 
