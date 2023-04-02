@@ -741,7 +741,7 @@
 
 </script>
 <script>
-    const URL2 = 'https://teachablemachine.withgoogle.com/models/tPCPE7VXk/';
+    const URL2 = 'https://teachablemachine.withgoogle.com/models/Kk_HvtZ1P/';
     
     let model2, labelContainer2, maxPredictions2;
     
@@ -766,23 +766,25 @@
         // predict can take in an image, video or canvas html element
         var image = document.getElementById('imagePreview');
         const prediction2 = await model2.predict(image, false);
+        var finalDesc = "";
         console.log(image)
         for (let i = 0; i < maxPredictions2; i++) {
             const classPrediction2 =
                 prediction2[i].className + ': ' + prediction2[i].probability.toFixed(2);
             labelContainer.childNodes[i].innerHTML = classPrediction2;
         }
-        console.log(prediction2[0])
-        console.log(prediction2[1])
-        if (prediction2[0].probability>prediction2[1].probability){
-            console.log(prediction2[0])
-            console.log("please upload food image")
-        }else{
-            console.log(prediction2[1])
-            console.log("ello")
+        console.log(prediction2)
+        finalDesc=prediction2[0]
+        for(let i =0; i<maxPredictions2;i++){
+            console.log(prediction2[i])
+            if(prediction2[i].probability>finalDesc){
+                finalDesc=prediction2[i]
+            }
+        }
+        console.log(finalDesc)
+        if(finalDesc.className=="CBG Reading"){
             uploadFile(event.target.files[0])
         }
-        
         //console.log(event.target.files[0])
     }
 
@@ -791,19 +793,22 @@
         var image = document.getElementById('imagePreview');
         const prediction2 = await model2.predict(image, false);
         console.log(image)
+        var finalDesc=""
         for (let i = 0; i < maxPredictions2; i++) {
             const classPrediction2 =
                 prediction2[i].className + ': ' + prediction2[i].probability.toFixed(2);
             labelContainer.childNodes[i].innerHTML = classPrediction2;
         }
-        console.log(prediction2[0])
-        console.log(prediction2[1])
-        if (prediction2[0].probability>prediction2[1].probability){
-            console.log(prediction2[0])
-            console.log("please upload food image")
-        }else{
-            console.log(prediction2[1])
-            console.log("ello")
+        console.log(prediction2)
+        finalDesc=prediction2[0]
+        for(let i =0; i<maxPredictions2;i++){
+            console.log(prediction2[i])
+            if(prediction2[i].probability>finalDesc){
+                finalDesc=prediction2[i]
+            }
+        }
+        console.log(finalDesc)
+        if(finalDesc.className=="CBG Reading"){
             uploadFile3(event.target.files[0])
         }
         
