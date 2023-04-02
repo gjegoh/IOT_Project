@@ -121,9 +121,17 @@
     var today_datetime = []
 
     for (let i = 0; i < results.length; i++) {
+        let before_reading = results[i]['Before_CBG_Reading']
+        let after_reading = results[i]['After_CBG_Reading']
         if(results[i]['Before_CBG_Uploaded_At'].slice(0, 10) == today) {
-            today_readings.push(results[i]['Before_CBG_Reading'])
-            today_readings.push(results[i]['After_CBG_Reading'])
+            if(results[i]['Before_CBG_Measurement'] != 'mmolL') {
+                before_reading = before_reading * mgTommol
+            }
+            if(results[i]['After_CBG_Measurement'] != 'mmolL') {
+                after_reading = after_reading * mgTommol
+            }
+            today_readings.push(before_reading.toFixed(1))
+            today_readings.push(after_reading.toFixed(1))
             today_datetime.push(results[i]['Before_CBG_Uploaded_At'])
             today_datetime.push(results[i]['After_CBG_Uploaded_At'])
         }
@@ -145,6 +153,8 @@
         }
     }
 
+    weekly_dates = weekly_dates.reverse()
+
     weekly_records = []
     weekly_readings = []
     weekly_datetime = []
@@ -152,10 +162,18 @@
 
     for (eachdate of weekly_dates) {
         for (let i = 0; i < results.length; i++) {
+            let before_reading = results[i]['Before_CBG_Reading']
+            let after_reading = results[i]['After_CBG_Reading']
             if(results[i]['Before_CBG_Uploaded_At'].slice(0, 10) == eachdate) {
+                if(results[i]['Before_CBG_Measurement'] != 'mmolL') {
+                    before_reading = before_reading * mgTommol
+                }
+                if(results[i]['After_CBG_Measurement'] != 'mmolL') {
+                    after_reading = after_reading * mgTommol
+                }
                 weekly_records.push(results[i])
-                weekly_readings.push(results[i]['Before_CBG_Reading'])
-                weekly_readings.push(results[i]['After_CBG_Reading'])
+                weekly_readings.push(before_reading.toFixed(1))
+                weekly_readings.push(after_reading.toFixed(1))
                 weekly_datetime.push(results[i]['Before_CBG_Uploaded_At'])
                 weekly_datetime.push(results[i]['After_CBG_Uploaded_At'])
                 food_item.push(results[i]['Food_Name'])
@@ -175,33 +193,44 @@
             halfweekly_dates.push(d.getFullYear() + '/0' + parseInt(d.getMonth() + 1) + '/' + parseInt(d.getDate() - i))
         }
     }
+
+    halfweekly_dates = halfweekly_dates.reverse()
     halfweekly_readings = []
     halfweekly_datetime = []
 
     for (eachdate of halfweekly_dates) {
         for (let i = 0; i < results.length; i++) {
+            let before_reading = results[i]['Before_CBG_Reading']
+            let after_reading = results[i]['After_CBG_Reading']
             if(results[i]['Before_CBG_Uploaded_At'].slice(0, 10) == eachdate) {
-                halfweekly_readings.push(results[i]['Before_CBG_Reading'])
-                halfweekly_readings.push(results[i]['After_CBG_Reading'])
+                if(results[i]['Before_CBG_Measurement'] != 'mmolL') {
+                    before_reading = before_reading * mgTommol
+                }
+                if(results[i]['After_CBG_Measurement'] != 'mmolL') {
+                    after_reading = after_reading * mgTommol
+                }
+                halfweekly_readings.push(before_reading.toFixed(1))
+                halfweekly_readings.push(after_reading.toFixed(1))
                 halfweekly_datetime.push(results[i]['Before_CBG_Uploaded_At'])
                 halfweekly_datetime.push(results[i]['After_CBG_Uploaded_At'])
             }
         }
     }
 
+    const threshold_reading = 7.5
     threshold_halfweekly = []
     for(let i = 0; i < halfweekly_readings.length; i++) {
-        threshold_halfweekly.push('7.5')
+        threshold_halfweekly.push(threshold_reading)
     }
 
     threshold_daily = []
     for(let i = 0; i < today_readings.length; i++) {
-        threshold_daily.push('7.5')
+        threshold_daily.push(threshold_reading)
     }
 
     threshold_weekly = []
     for(let i = 0; i < weekly_readings.length; i++) {
-        threshold_weekly.push('7.5')
+        threshold_weekly.push(threshold_reading)
     }
 
     const actions = [
@@ -520,8 +549,16 @@
     log_dict = {}
 
     for(let i=0; i < results.length; i++) {
-        before_CBG = results[i]['Before_CBG_Reading'] 
-        after_CBG = results[i]['After_CBG_Reading']
+        let before_CBG = results[i]['Before_CBG_Reading'] 
+        let after_CBG = results[i]['After_CBG_Reading']
+
+        if(results[i]['Before_CBG_Measurement'] != 'mmolL') {
+            before_CBG = before_CBG * mgTommol
+        }
+        if(results[i]['After_CBG_Measurement'] != 'mmolL') {
+            after_CBG = after_CBG * mgTommol
+        }
+        
         difference = after_CBG - before_CBG
 
         food_name = results[i]['Food_Name']
