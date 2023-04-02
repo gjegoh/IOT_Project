@@ -42,5 +42,6 @@ class Process_CBG():
                     measurement += 'L'
                 found_Measurement = True
         if measurement == 'mmolL' and not re.match("\d+\.\d+", reading):
-            reading = reading[0] + '.' + reading[1]
+            if len(reading) >= 2:
+                reading = reading[:len(reading)-1] + '.' + reading[-1]
         return float(reading), measurement
