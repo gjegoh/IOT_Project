@@ -41,5 +41,6 @@ class Process_CBG():
                 else:
                     measurement += 'L'
                 found_Measurement = True
-        
+        if measurement == 'mmolL' and not re.match("\d+\.\d+", reading):
+            reading = reading[0] + '.' + reading[1]
         return float(reading), measurement
