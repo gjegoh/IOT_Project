@@ -455,11 +455,12 @@
 			console.log(response.hits[0].recipe.totalNutrients.CHOCDF.quantity,response.hits[0].recipe.totalNutrients.CHOCDF.unit)
 			console.log(response.hits[0].recipe.totalNutrients.FIBTG.quantity,response.hits[0].recipe.totalNutrients.FIBTG.unit)
 			console.log(response.hits[0].recipe.totalNutrients.ENERC_KCAL.unit,response.hits[0].recipe.totalNutrients.ENERC_KCAL.quantity)
-
+            
             document.getElementById('reading2').value=response.hits[0].recipe.totalNutrients.ENERC_KCAL.quantity.toFixed(1)
             document.getElementById('reading3').value=response.hits[0].recipe.totalNutrients.CHOCDF.quantity.toFixed(1)
             document.getElementById('reading4').value=response.hits[0].recipe.totalNutrients.SUGAR.quantity.toFixed(1)
             document.getElementById('reading5').value=response.hits[0].recipe.totalNutrients.FIBTG.quantity.toFixed(1)
+            document.getElementById('reading7').value = finalClass
 			//sugar carbs fibre and calories
 			})
 		
